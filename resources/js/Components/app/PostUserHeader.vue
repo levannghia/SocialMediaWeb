@@ -33,7 +33,7 @@ defineProps({
           }}</a>
         </template>
       </h4>
-      <small v-if="showTime" class="text-gray-400">{{ post.created_at }}</small>
+      <small v-if="showTime" class="text-gray-400">{{ post.updated_at }}</small>
     </div>
   </div>
 </template>

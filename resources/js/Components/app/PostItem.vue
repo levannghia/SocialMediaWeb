@@ -7,19 +7,30 @@ import {
   TrashIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/vue/20/solid";
-import PostModal from "@/Components/app/PostModal.vue";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue"
 import { ref } from "vue";
+import { router } from "@inertiajs/vue3";
 
-defineProps({
+const props = defineProps({
   post: Object,
 });
 
-const showEditModal = ref(false);
+const emit = defineEmits(['editClick']);
+function openEditModal() {
+  emit('editClick', props.post)
+}
 
 function isImage(attachment) {
   const mime = attachment.mime.split("/");
   return mime[0].toLowerCase() === "image";
+}
+
+function deletePost(){
+  if(window.confirm('Bạn có chắc chắn xóa bài viết này?')){
+    router.delete(route('post.destroy', props.post), {
+      preserveScroll: true,
+    });
+  }
 }
 </script>
 
@@ -51,7 +62,7 @@ function isImage(attachment) {
             <div class="px-1 py-1">
               <MenuItem v-slot="{ active }">
                 <button
-                  @click="showEditModal = true"
+                  @click="openEditModal"
                   :class="[
                     active ? 'bg-violet-500 text-white' : 'text-gray-900',
                     'group flex w-full items-center rounded-md px-2 py-2 text-sm',
@@ -66,13 +77,13 @@ function isImage(attachment) {
               </MenuItem>
               <MenuItem v-slot="{ active }">
                 <button
+                  @click="deletePost"
                   :class="[
                     active ? 'bg-violet-500 text-white' : 'text-gray-900',
                     'group flex w-full items-center rounded-md px-2 py-2 text-sm',
                   ]"
                 >
                   <TrashIcon
-                    :active="active"
                     class="mr-2 h-5 w-5 text-violet-400"
                     aria-hidden="true"
                   />
@@ -187,5 +198,5 @@ function isImage(attachment) {
       </button>
     </div>
   </div>
-  <PostModal :post="post" v-model="showEditModal" />
+  
 </template>

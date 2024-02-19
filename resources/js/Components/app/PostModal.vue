@@ -26,13 +26,13 @@
                 </DialogTitle>
                 <div class="mt-2">
                   <PostUserHeader :post="post" :showTime="false" />
-                  <InputTextarea v-model="post.body" class="mb-3 mt-3 w-full" />
+                  <InputTextarea v-model="form.body" class="mb-3 mt-3 w-full" />
                 </div>
 
                 <div class="mt-4">
                   <button type="button"
                     class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    @click="closeModal">
+                    @click="submit">
                     Submit
                   </button>
                 </div>
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import {
   TransitionRoot,
   TransitionChild,
@@ -59,6 +59,7 @@ import PostUserHeader from "@/Components/app/PostUserHeader.vue"
 import {
   XMarkIcon
 } from "@heroicons/vue/20/solid";
+import { useForm } from "@inertiajs/vue3";
 
 const props = defineProps({
   post: {
@@ -66,6 +67,12 @@ const props = defineProps({
     required: true,
   },
   modelValue: Boolean,
+});
+
+
+const form = useForm({
+  id: null,
+  body: '',
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -77,5 +84,21 @@ const show = computed({
 
 function closeModal() {
   show.value = false;
+}
+
+watch(() => props.post, () => {
+  // console.log("change", props.post);
+  form.id = props.post.id;
+  form.body = props.post.body;
+})
+
+function submit() {
+
+  form.put(route('post.update', props.post), {
+    preserveScroll: true,
+    onSuccess: () => {
+      show.value = false;
+    }
+  });
 }
 </script>
