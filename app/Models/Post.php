@@ -24,4 +24,9 @@ class Post extends Model
     {
         return $this->belongsTo(Group::class);
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(PostAttachment::class);
+    }
 }
