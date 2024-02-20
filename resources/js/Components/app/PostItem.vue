@@ -10,6 +10,7 @@ import {
 import PostUserHeader from "@/Components/app/PostUserHeader.vue"
 import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
+import { isImage } from "@/helpers";
 
 const props = defineProps({
   post: Object,
@@ -20,10 +21,7 @@ function openEditModal() {
   emit('editClick', props.post)
 }
 
-function isImage(attachment) {
-  const mime = attachment.mime.split("/");
-  return mime[0].toLowerCase() === "image";
-}
+
 
 function deletePost() {
   if (window.confirm('Bạn có chắc chắn xóa bài viết này?')) {
