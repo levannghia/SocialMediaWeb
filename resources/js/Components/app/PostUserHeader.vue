@@ -13,7 +13,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2 mb-3">
     <a href="javascript:void(0)">
       <img
         :src="post.user.avatar_url"

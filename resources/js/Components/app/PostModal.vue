@@ -16,7 +16,7 @@
                 class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <DialogTitle as="h3"
                   class="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between">
-                  Update Post
+                  {{ form.id ? 'Update Post' : 'Create Post' }}
 
                   <button
                     class="w-8 h-8 rounded-full hover:bg-black/5 dark:hover:bg-black/30 transition flex items-center justify-center"
@@ -26,13 +26,22 @@
                 </DialogTitle>
                 <div class="mt-2">
                   <PostUserHeader :post="post" :showTime="false" />
-                  <InputTextarea v-model="form.body" class="mb-3 mt-3 w-full" />
+                  <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
+                  <!-- <InputTextarea v-model="form.body" class="mb-3 mt-3 w-full" /> -->
                 </div>
 
-                <div class="mt-4">
+                <div class="flex gap-3 py-3">
                   <button type="button"
-                    class="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                    class="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-full relative">
+                    <PaperClipIcon class="w-4 h-4 mr-2" />
+                    Attach Files
+                    <input @click.stop @change="onAttachmentChoose" type="file" multiple
+                      class="absolute left-0 top-0 right-0 bottom-0 opacity-0">
+                  </button>
+                  <button type="button"
+                    class="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-full"
                     @click="submit">
+                    <BookmarkIcon class="w-4 h-4 mr-2" />
                     Submit
                   </button>
                 </div>
@@ -57,9 +66,20 @@ import {
 import InputTextarea from "@/Components/InputTextarea.vue";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue"
 import {
-  XMarkIcon
+  XMarkIcon,
+  PaperClipIcon,
+  BookmarkIcon
 } from "@heroicons/vue/20/solid";
 import { useForm } from "@inertiajs/vue3";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
+const editor = ClassicEditor;
+const editorConfig = {
+  mediaEmbed: {
+    removeProviders: ['dailymotion', 'spotify', 'youtube', 'vimeo', 'instagram', 'twitter', 'googleMaps', 'flickr', 'facebook']
+  },
+  toolbar: ['bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'heading', '|', 'outdent', 'indent', '|', 'link', '|', 'blockQuote'],
+}
 
 const props = defineProps({
   post: {
@@ -93,12 +113,26 @@ watch(() => props.post, () => {
 })
 
 function submit() {
+  if (form.id) {
+    form.put(route('post.update', props.post), {
+      preserveScroll: true,
+      onSuccess: () => {
+        show.value = false;
+      }
+    });
+  } else {
+    form.post(route('post.store'), {
+      preserveScroll: true,
+      onSuccess: () => {
+        show.value = false;
+        form.id = null;
+        form.body = '';
+      }
+    })
+  }
+}
 
-  form.put(route('post.update', props.post), {
-    preserveScroll: true,
-    onSuccess: () => {
-      show.value = false;
-    }
-  });
+function onAttachmentChoose(event) {
+  console.log(event.target.files);
 }
 </script>
