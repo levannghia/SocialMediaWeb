@@ -27,31 +27,22 @@
                 <div class="mt-2">
                   <PostUserHeader :post="post" :showTime="false" />
                   <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
-                  <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
-                    <template v-for="attachment of post.attachments" :key="attachment.id">
+                  <div class="grid gap-3 mt-3" :class="attachmentFiles.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
+                    <template v-for="(attachment, id) of attachmentFiles" :key="attachment.id">
                       <div class="bg-blue-100 aspect-square flex flex-col items-center justify-center relative group">
                         <button
-                          class="opacity-0 group-hover:opacity-100 w-8 h-8 absolute top-2 right-2 flex items-center justify-center rounded text-gray-100 bg-gray-700 transition-all hover:bg-gray-800">
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-                            <path fill-rule="evenodd"
-                              d="M12 2.25a.75.75 0 0 1 .75.75v11.69l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V3a.75.75 0 0 1 .75-.75Zm-9 13.5a.75.75 0 0 1 .75.75v2.25a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5V16.5a.75.75 0 0 1 1.5 0v2.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V16.5a.75.75 0 0 1 .75-.75Z"
-                              clip-rule="evenodd" />
-                          </svg>
+                          class="absolute z-20 right-2 top-2 w-7 h-7 flex items-center justify-center bg-black/30 text-white rounded-full hover:bg-black/40">
+                          <XMarkIcon class="w-5 h-5" />
                         </button>
-
-                        <img v-if="false" :src="attachment.url" alt=""
+                        <img v-if="isImage(attachment.file)" :src="attachment.url" alt=""
                           class="object-cover aspect-square max-h-full max-w-full" />
 
                         <template v-else>
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                            class="w-16 h-16 text-gray-500">
-                            <path
-                              d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625Z" />
-                            <path
-                              d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
-                          </svg>
+                          <small class="flex flex-col justify-center items-center">
+                            <PaperClipIcon class="w-10 h-10" />
 
-                          {{ attachment.name }}
+                            {{ attachment.file.name }}
+                          </small>
                         </template>
                       </div>
                     </template>
@@ -95,8 +86,8 @@ import InputTextarea from "@/Components/InputTextarea.vue";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue"
 import {
   XMarkIcon,
-  PaperClipIcon,
-  BookmarkIcon
+  BookmarkIcon,
+  PaperClipIcon
 } from "@heroicons/vue/20/solid";
 import { useForm } from "@inertiajs/vue3";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
@@ -166,10 +157,11 @@ async function onAttachmentChoose(event) {
   for (const file of event.target.files) {
     const myFile = {
       file,
-      src: await readFile(file)
+      url: await readFile(file)
     }
     attachmentFiles.value.push(myFile)
   }
+  console.log(attachmentFiles.value);
 }
 
 async function readFile(file) {

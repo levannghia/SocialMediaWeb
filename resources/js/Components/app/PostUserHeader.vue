@@ -18,7 +18,7 @@ defineProps({
       <img
         :src="post.user.avatar_url"
         alt=""
-        class="w-[40px] rounded-full border-2 hover:border-blue-500 transition-all"
+        class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all"
       />
     </a>
     <div>
@@ -36,4 +36,5 @@ defineProps({
       <small v-if="showTime" class="text-gray-400">{{ post.updated_at }}</small>
     </div>
   </div>
+
 </template>

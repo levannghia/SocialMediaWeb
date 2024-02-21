@@ -1,4 +1,5 @@
 export const isImage = (attachment) => {
-    const mime = attachment.mime.split("/");
+    let mime = attachment.mime || attachment.type
+    mime = mime.split("/");
     return mime[0].toLowerCase() === "image";
   }

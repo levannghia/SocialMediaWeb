@@ -18,7 +18,7 @@ const props = defineProps({
 
 const emit = defineEmits(['editClick']);
 function openEditModal() {
-  emit('editClick', props.post)
+  emit('editClick', props.post);
 }
 
 
@@ -75,7 +75,7 @@ function deletePost() {
     </div>
     <div>
       <Disclosure v-slot="{ open }">
-        <div v-if="!open" class="ck-content-output" v-html="post.body.substring(0, 200)" />
+        <div v-if="!open" class="ck-content-output" v-html="post.body.substring(0, 200) + '...'" />
         <template v-if="post.body && post.body.length > 200">
           <DisclosurePanel>
             <div class="ck-content-output" v-html="post.body" />
