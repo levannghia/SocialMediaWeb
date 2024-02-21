@@ -27,25 +27,25 @@
                 <div class="mt-2">
                   <PostUserHeader :post="post" :showTime="false" />
                   <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
-                  <div class="grid gap-3 mt-3" :class="attachmentFiles.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
-                    <template v-for="(attachment, index) of attachmentFiles.slice(0, 4)" :key="attachment.id">
+                  <div class="grid gap-3 mt-3" :class="computedAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
+                    <template v-for="(attachment, index) of computedAttachments" :key="attachment.id">
                       <div class="bg-blue-100 aspect-square flex flex-col items-center justify-center relative group">
-                        <div v-if="index >= 3"
+                        <!-- <div v-if="index >= 3"
                           class="absolute top-0 left-0 right-0 bottom-0 z-10 bg-black/30 justify-center flex items-center text-2xl text-white">
                           + {{ attachmentFiles.length - 4 }} more
-                        </div>
+                        </div> -->
                         <button @click="removeFile(attachment)"
                           class="absolute z-20 right-2 top-2 w-7 h-7 flex items-center justify-center bg-black/30 text-white rounded-full hover:bg-black/40">
                           <XMarkIcon class="w-5 h-5" />
                         </button>
-                        <img v-if="isImage(attachment.file)" :src="attachment.url" alt=""
-                          class="object-cover aspect-square max-h-full max-w-full" />
+                        <img v-if="isImage(attachment.file || attachment)" :src="attachment.url" alt=""
+                          class="object-contain aspect-square max-h-full max-w-full" />
 
                         <template v-else>
                           <small class="flex flex-col justify-center items-center">
                             <PaperClipIcon class="w-10 h-10" />
 
-                            {{ attachment.file.name }}
+                            {{ (attachment.file || attachment).name }}
                           </small>
                         </template>
                       </div>
@@ -117,10 +117,15 @@ const props = defineProps({
 const form = useForm({
   id: null,
   body: '',
+  attachments: [],
 });
 const attachmentFiles = ref([]);
 
 const emit = defineEmits(["update:modelValue"]);
+
+const computedAttachments = computed(() => {
+  return [...attachmentFiles.value, ...(props.post.attachments || [])]
+})
 
 const show = computed({
   get: () => props.modelValue,
@@ -129,6 +134,10 @@ const show = computed({
 
 function closeModal() {
   show.value = false;
+  resetModal();
+}
+
+function resetModal(){
   form.reset();
   attachmentFiles.value = [];
 }
@@ -140,11 +149,16 @@ watch(() => props.post, () => {
 })
 
 function submit() {
+  form.attachments = attachmentFiles.value.map(myFile => {
+    return myFile.file;
+  })
+
   if (form.id) {
     form.put(route('post.update', props.post), {
       preserveScroll: true,
       onSuccess: () => {
         show.value = false;
+        closeModal();
       }
     });
   } else {
@@ -152,8 +166,7 @@ function submit() {
       preserveScroll: true,
       onSuccess: () => {
         show.value = false;
-        form.id = null;
-        form.body = '';
+        closeModal();
       }
     })
   }

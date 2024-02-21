@@ -10,7 +10,7 @@ use Inertia\Inertia;
 class HomeController extends Controller
 {
     public function index() {
-        $posts = Post::query()->latest()->paginate(20);
+        $posts = Post::query()->with(['attachments', 'user'])->latest()->paginate(20);
         return Inertia::render('Home', [
             'posts' => PostResource::collection($posts),
         ]);
