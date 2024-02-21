@@ -28,9 +28,13 @@
                   <PostUserHeader :post="post" :showTime="false" />
                   <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
                   <div class="grid gap-3 mt-3" :class="attachmentFiles.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
-                    <template v-for="(attachment, id) of attachmentFiles" :key="attachment.id">
+                    <template v-for="(attachment, index) of attachmentFiles.slice(0, 4)" :key="attachment.id">
                       <div class="bg-blue-100 aspect-square flex flex-col items-center justify-center relative group">
-                        <button
+                        <div v-if="index >= 3"
+                          class="absolute top-0 left-0 right-0 bottom-0 z-10 bg-black/30 justify-center flex items-center text-2xl text-white">
+                          + {{ attachmentFiles.length - 4 }} more
+                        </div>
+                        <button @click="removeFile(attachment)"
                           class="absolute z-20 right-2 top-2 w-7 h-7 flex items-center justify-center bg-black/30 text-white rounded-full hover:bg-black/40">
                           <XMarkIcon class="w-5 h-5" />
                         </button>
@@ -125,6 +129,8 @@ const show = computed({
 
 function closeModal() {
   show.value = false;
+  form.reset();
+  attachmentFiles.value = [];
 }
 
 watch(() => props.post, () => {
@@ -161,6 +167,8 @@ async function onAttachmentChoose(event) {
     }
     attachmentFiles.value.push(myFile)
   }
+
+  event.target.value = null
   console.log(attachmentFiles.value);
 }
 
@@ -177,5 +185,9 @@ async function readFile(file) {
       res(null)
     }
   })
+}
+
+function removeFile(file) {
+  attachmentFiles.value = attachmentFiles.value.filter(f => f !== file);
 }
 </script>
