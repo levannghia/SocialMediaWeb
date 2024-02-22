@@ -52,7 +52,7 @@ class PostController extends Controller
                 Storage::disk('public')->delete($path);
             }
             DB::rollBack();
-            Log::debug("Lỗi function store post: " . $e->getMessage() . ' --line:' .$e->getLine());
+            Log::debug("Lỗi function store post: " . $e->getMessage() . ' --line:' . $e->getLine());
         }
 
         return redirect()->back();
@@ -79,8 +79,61 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $post->update($request->validated());
+        $data = $request->validated();
+        $user = $request->user();
+
+        // dd($data['attachments']);
+        DB::beginTransaction();
+
+        $allFilesPath = [];
+        try {
+            $post->update($data);
+
+            /** @var \Illuminate\Http\UploadedFile[] $files */
+
+            $deletedFilesId = $data['deleted_file_ids'] ?? [];
+
+            $postAttachmentList = PostAttachment::where('post_id', $post->id)->whereIn('id', $deletedFilesId)->get();
+            foreach ($postAttachmentList as $attachment) {
+                $attachment->delete();
+            }
+
+            $files = $data['attachments'] ?? [];
+            foreach ($files as $file) {
+                $path = $file->store('attachments/' . $post->id, 'public');
+                $allFilesPath[] = $path;
+                $attachment = PostAttachment::create([
+                    'post_id' => $post->id,
+                    'name' => $file->getClientOriginalName(),
+                    'path' => $path,
+                    'mime' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'created_by' => $user->id,
+                    // 'created_at' => Carbon::now()
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            foreach ($allFilesPath as $path) {
+                Storage::disk('public')->delete($path);
+            }
+            DB::rollBack();
+            Log::debug("Lỗi function update post: " . $e->getMessage() . ' --line:' . $e->getLine());
+        }
+
         return back();
+    }
+
+    public function downloadAttachment(PostAttachment $attachment)
+    {
+        $path = storage_path($attachment->path);
+
+        // dd($path);
+
+        // if(Storage::disk('public')->exists($path)){
+            return response()->download(Storage::disk('public')->path($attachment->path), $attachment->name);
+        // }
     }
 
     /**

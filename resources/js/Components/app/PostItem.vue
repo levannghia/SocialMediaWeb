@@ -90,17 +90,17 @@ function deletePost() {
       </Disclosure>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 mb-3" :class="post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
+    <div class="grid gap-3 mb-3" :class="post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
       <template v-for="(attachment, index) of post.attachments.slice(0,4)" :key="attachment.id">
         <div class="bg-blue-100 aspect-square flex flex-col items-center justify-center relative group">
-          <div v-if="index === 3"
+          <div v-if="index === 3 && post.attachments.length > 4 "
             class="absolute top-0 left-0 right-0 bottom-0 z-10 bg-black/30 justify-center flex items-center text-2xl text-white">
             + {{ post.attachments.length - 4 }} more
           </div>
-          <button
+          <a :href="route('post.download', attachment)"
             class="opacity-0 group-hover:opacity-100 w-8 h-8 absolute top-2 right-2 flex items-center justify-center rounded text-gray-100 bg-gray-700 transition-all hover:bg-gray-800">
             <ArrowDownTrayIcon class="w-4 h-4"/>
-          </button>
+          </a>
 
           <img v-if="isImage(attachment)" :src="attachment.url" alt=""
             class="object-contain aspect-square max-h-full max-w-full" />
