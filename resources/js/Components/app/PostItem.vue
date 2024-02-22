@@ -12,6 +12,7 @@ import PostUserHeader from "@/Components/app/PostUserHeader.vue"
 import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { isImage } from "@/helpers";
+import UrlPreview from "@/Components/app/UrlPreview.vue";
 
 const props = defineProps({
   post: Object,
@@ -21,7 +22,6 @@ const emit = defineEmits(['editClick']);
 function openEditModal() {
   emit('editClick', props.post);
 }
-
 
 
 function deletePost() {
