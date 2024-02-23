@@ -26,24 +26,40 @@
                 </DialogTitle>
                 <div class="mt-2">
                   <PostUserHeader :post="post" :showTime="false" />
-                  <pre>{{ form.deleted_file_ids }}</pre>
+
                   <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
+
+                  <div v-if="showExtensionsText"
+                    class="border-l-4 border-amber-500 py-2 px-3 bg-amber-100 mt-3 text-gray-800">
+                    Files must be one of the following extensions <br>
+                    <small>{{ attachmentExtensions.join(', ') }}</small>
+                  </div>
+
+                  <div v-if="formErrors.attachments"
+                    class="border-l-4 border-red-500 py-2 px-3 bg-red-100 mt-3 text-gray-800">
+                    {{ formErrors.attachments }}
+                  </div>
+                  
                   <div class="grid gap-3 mt-3" :class="computedAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
                     <template v-for="(attachment, index) of computedAttachments" :key="attachment.id">
-                      <div class="bg-blue-100 aspect-square flex flex-col items-center justify-center relative group">
+                      <div
+                        class="group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative border-2"
+                        :class="attachmentErrors[index] ? 'border-red-500' : ''">
                         <div v-if="attachment.deleted"
                           class="absolute z-10 left-0 bottom-0 right-0 py-2 px-3 text-sm bg-black text-white flex justify-between items-center">
                           To be deleted
-                          <ArrowUturnLeftIcon class="w-4 h-4 cursor-pointer" @click="undoDelete(attachment)"/>
+                          <ArrowUturnLeftIcon class="w-4 h-4 cursor-pointer" @click="undoDelete(attachment)" />
                         </div>
                         <button @click="removeFile(attachment)"
                           class="absolute z-20 right-2 top-2 w-7 h-7 flex items-center justify-center bg-black/30 text-white rounded-full hover:bg-black/40">
                           <XMarkIcon class="w-5 h-5" />
                         </button>
                         <img v-if="isImage(attachment.file || attachment)" :src="attachment.url" alt=""
-                          class="object-contain aspect-square max-h-full max-w-full" :class="attachment.deleted ? 'opacity-50' : ''" />
+                          class="object-contain aspect-square max-h-full max-w-full"
+                          :class="attachment.deleted ? 'opacity-50' : ''" />
 
-                        <div v-else class="flex flex-col justify-center items-center px-3" :class="attachment.deleted ? 'opacity-50' : ''">
+                        <div v-else class="flex flex-col justify-center items-center px-3"
+                          :class="attachment.deleted ? 'opacity-50' : ''">
                           <PaperClipIcon class="w-10 h-10" />
                           <small class="">
                             {{ (attachment.file || attachment).name }}
@@ -95,10 +111,11 @@ import {
   PaperClipIcon,
   ArrowUturnLeftIcon
 } from "@heroicons/vue/20/solid";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { isImage } from "@/helpers";
 
+const attachmentExtensions = usePage().props.attachmentExtensions;
 const editor = ClassicEditor;
 const editorConfig = {
   mediaEmbed: {
@@ -123,7 +140,10 @@ const form = useForm({
   deleted_file_ids: [],
   _method: 'POST'
 });
+
 const attachmentFiles = ref([]);
+const attachmentErrors = ref([]);
+const formErrors = ref({});
 
 const emit = defineEmits(["update:modelValue", "hide"]);
 
@@ -144,6 +164,7 @@ function closeModal() {
 
 function resetModal() {
   form.reset();
+  formErrors.value = {}
   attachmentFiles.value = [];
   props.post.attachments.forEach(file => file.deleted = false);
 }
@@ -153,8 +174,21 @@ function undoDelete(myFile) {
   form.deleted_file_ids = form.deleted_file_ids.filter(id => myFile.id !== id)
 }
 
+const showExtensionsText = computed(() => {
+  for (const myFile of attachmentFiles.value) {
+    const file = myFile.file;
+    const parts = file.name.split('.')
+    const ext = parts.pop().toLowerCase();
+    if (!attachmentExtensions.includes(ext)) {
+      return true
+    }
+  }
+
+  return false
+})
+
 watch(() => props.post, () => {
-  console.log("change", props.post);
+  // console.log("change", props.post);
   form.id = props.post.id;
   form.body = props.post.body || '';
 })
@@ -171,6 +205,9 @@ function submit() {
       onSuccess: () => {
         show.value = false;
         closeModal();
+      },
+      onError: (errors) => {
+        process(errors)
       }
     });
   } else {
@@ -179,8 +216,22 @@ function submit() {
       onSuccess: () => {
         show.value = false;
         closeModal();
+      },
+      onError: (errors) => {
+        process(errors)
       }
     })
+  }
+}
+
+function process(errors) {
+  formErrors.value = errors
+  for (const key in errors) {
+    if (key.includes('.')) {
+      const [, index] = key.split('.');
+      console.log(key.split('.'));
+      attachmentErrors.value[index] = errors[key]
+    }
   }
 }
 
@@ -194,7 +245,7 @@ async function onAttachmentChoose(event) {
   }
 
   event.target.value = null
-  console.log(attachmentFiles.value);
+  // console.log(attachmentFiles.value);
 }
 
 async function readFile(file) {
