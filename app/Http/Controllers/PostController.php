@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Enums\PostReactionEnum;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Post;
 use App\Models\PostAttachment;
+use App\Models\PostReaction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class PostController extends Controller
 {
@@ -134,6 +137,34 @@ class PostController extends Controller
         // if(Storage::disk('public')->exists($path)){
             return response()->download(Storage::disk('public')->path($attachment->path), $attachment->name);
         // }
+    }
+
+    public function postReaction(Request $request, Post $post) 
+    {
+        $data = $request->validate([
+            'reaction' => [Rule::enum(PostReactionEnum::class)]
+        ]);
+
+        $reaction  = PostReaction::where('post_id', $post->id)->where('user_id', auth()->id())->first();
+
+        if($reaction){
+            $hasReaction = false;
+            $reaction->delete();
+        }else{
+            $hasReaction = true;
+            PostReaction::create([
+                'post_id' => $post->id,
+                'user_id' => auth()->id(),
+                'type' => $data['reaction'],
+            ]);
+        }
+        
+        $reaction  = PostReaction::where('post_id', $post->id)->count();
+
+        return response([
+            'num_of_reaction' => $reaction,
+            'current_user_has_reaction' => $hasReaction,
+        ]);
     }
 
     /**

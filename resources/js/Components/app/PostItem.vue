@@ -14,6 +14,7 @@ import { ref } from "vue";
 import { router } from "@inertiajs/vue3";
 import { isImage } from "@/helpers";
 import UrlPreview from "@/Components/app/UrlPreview.vue";
+import axiosClient from "@/axiosClient";
 
 const props = defineProps({
   post: Object,
@@ -34,6 +35,17 @@ function deletePost() {
       preserveScroll: true,
     });
   }
+}
+
+function sendReaction()
+{
+  axiosClient.post(route('post.reaction', props.post), {
+    reaction: 'like',
+  })
+  .then(({data}) => {
+    props.post.num_of_reaction = data.num_of_reaction;
+    props.post.current_user_has_reaction = data.current_user_has_reaction;
+  })
 }
 </script>
 
@@ -117,9 +129,16 @@ function deletePost() {
       </template>
     </div>
     <div class="flex gap-2">
-      <button class="flex flex-1 text-gray-800 items-center py-2 px-4 gap-1 justify-center bg-gray-100 hover:bg-gray-200">
+      <button @click="sendReaction" class="flex flex-1 text-gray-800 items-center py-2 px-4 gap-1 justify-center"
+        :class="[
+          post.current_user_has_reaction ? 
+          'bg-sky-100 hover:bg-sky-200':
+          'bg-gray-100 hover:bg-gray-200'
+        ]"
+      >
         <HandThumbUpIcon class="w-5 h-5" />
-        Like
+        <span class="mr-2">{{ post.num_of_reaction }}</span>
+        {{ post.current_user_has_reaction ? 'Unlike' : 'Like' }}
       </button>
       <button class="flex flex-1 text-gray-800 items-center py-2 px-4 gap-1 justify-center bg-gray-100 hover:bg-gray-200">
         <ChatBubbleLeftRightIcon class="w-5 h-5" />

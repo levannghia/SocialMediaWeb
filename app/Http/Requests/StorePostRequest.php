@@ -40,7 +40,7 @@ class StorePostRequest extends FormRequest
                     $totalSize = collect($value)->sum(function(UploadedFile $file) {
                         return $file->getSize();
                     });
-                    dd($totalSize);
+                    // dd($totalSize);
                     if ($totalSize > 1 * 1024 * 1024 * 1024) {
                         $fail('The total size of all files must not exceed 1GB.');
                     }
@@ -72,6 +72,7 @@ class StorePostRequest extends FormRequest
         return [
             'attachments.*.file' => 'Each attachment must be a file.',
             'attachments.*.mimes' => 'Invalid file type for attachments.',
+            'attachments.*.max' => 'Kích thước file không vượt quá 500MB.',
         ];
     }
 }

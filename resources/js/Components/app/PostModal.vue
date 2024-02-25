@@ -39,7 +39,7 @@
                     class="border-l-4 border-red-500 py-2 px-3 bg-red-100 mt-3 text-gray-800">
                     {{ formErrors.attachments }}
                   </div>
-                  
+
                   <div class="grid gap-3 mt-3" :class="computedAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
                     <template v-for="(attachment, index) of computedAttachments" :key="attachment.id">
                       <div
@@ -166,7 +166,9 @@ function resetModal() {
   form.reset();
   formErrors.value = {}
   attachmentFiles.value = [];
-  props.post.attachments.forEach(file => file.deleted = false);
+  if (props.post.attachments) {
+    props.post.attachments.forEach(file => file.deleted = false);
+  }
 }
 
 function undoDelete(myFile) {
@@ -226,10 +228,11 @@ function submit() {
 
 function process(errors) {
   formErrors.value = errors
+  console.log(formErrors.value);
   for (const key in errors) {
     if (key.includes('.')) {
       const [, index] = key.split('.');
-      console.log(key.split('.'));
+      // console.log(key.split('.'));
       attachmentErrors.value[index] = errors[key]
     }
   }
