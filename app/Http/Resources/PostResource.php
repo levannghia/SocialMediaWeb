@@ -22,6 +22,7 @@ class PostResource extends JsonResource
             'attachments' => PostAttachmentResource::collection($this->whenLoaded('attachments')),
             'num_of_reaction' => $this->reactions_count,
             'current_user_has_reaction' => $this->reactions->count() > 0,
+            'num_of_comment' => 0,
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->diffForHumans(),
         ];
