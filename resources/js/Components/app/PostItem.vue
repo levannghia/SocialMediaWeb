@@ -17,6 +17,7 @@ import UrlPreview from "@/Components/app/UrlPreview.vue";
 import axiosClient from "@/axiosClient";
 import InputTextarea from "../InputTextarea.vue";
 import IndigoButton from "./IndigoButton.vue";
+import ReadMoreReadLess from "@/Components/app/ReadMoreReadLess.vue"
 
 const props = defineProps({
   post: Object,
@@ -54,12 +55,14 @@ function sendReaction() {
 }
 
 function createComment() {
-  axiosClient.post(route('post.comment.create', props.post),{
+  axiosClient.post(route('post.comment.create', props.post), {
     comment: newCommentText.value,
   })
-  .then(({data}) => {
-    console.log(data);
-  })
+    .then(({ data }) => {
+      newCommentText.value = '';
+      props.post.comments.unshift(data);
+      props.post.num_of_comment++;
+    })
 }
 </script>
 
@@ -105,19 +108,7 @@ function createComment() {
       </Menu>
     </div>
     <div>
-      <Disclosure v-slot="{ open }">
-        <div v-if="!open" class="ck-content-output" v-html="post.body.substring(0, 200)" />
-        <template v-if="post.body && post.body.length > 200">
-          <DisclosurePanel>
-            <div class="ck-content-output" v-html="post.body" />
-          </DisclosurePanel>
-          <div class="flex justify-end">
-            <DisclosureButton class="text-blue-500 hover:underline">
-              {{ open ? "Read Less" : "Read More" }}
-            </DisclosureButton>
-          </div>
-        </template>
-      </Disclosure>
+      <ReadMoreReadLess :content="post.body"/>
     </div>
 
     <div class="grid gap-3 mb-3" :class="post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
@@ -165,23 +156,32 @@ function createComment() {
       <DisclosurePanel class="mt-3">
         <div>
           <div class="flex items-center gap-2 mb-3">
-              <a href="javascript:void(0)">
-                <img :src="authUser.avatar_url" alt=""
-                  class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all" />
-              </a>
-              <div class="flex flex-1">
-                <InputTextarea v-model="newCommentText" rows="1" class="w-full max-h-[160px] resize-none rounded-r-none" placeholder="Enter your comment here"/>
-                <IndigoButton @click="createComment" class="rounded-l-none w-[100px]">Submit</IndigoButton>
-              </div>
+            <a href="javascript:void(0)">
+              <img :src="authUser.avatar_url" alt=""
+                class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all" />
+            </a>
+            <div class="flex flex-1">
+              <InputTextarea v-model="newCommentText" rows="1" class="w-full max-h-[160px] resize-none rounded-r-none"
+                placeholder="Enter your comment here" />
+              <IndigoButton @click="createComment" class="rounded-l-none w-[100px]">Submit</IndigoButton>
             </div>
+          </div>
         </div>
         <div>
-          <div>
-            
-            Comment item 1
-          </div>
-          <div>
-            Comment item 1
+          <div v-for="comment in props.post.comments" :key="comment.id" class="mb-3">
+            <div class="flex items-center gap-2">
+              <a href="javascript:void(0)">
+                <img :src="comment.user.avatar_url" alt=""
+                  class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all" />
+              </a>
+              <div>
+                <h4 class="font-bold">
+                  <a href="javascript:void(0)" class="hover:underline">{{ comment.user.name }}</a>
+                </h4>
+                <small class="text-gray-400 text-xs">{{ post.updated_at }}</small>
+              </div>
+            </div>
+            <ReadMoreReadLess :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm"/>
           </div>
         </div>
       </DisclosurePanel>

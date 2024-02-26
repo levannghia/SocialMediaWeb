@@ -18,7 +18,9 @@ class HomeController extends Controller
                 'attachments', 'user', 'reactions' => function ($query) use ($user_id) {
                     $query->where('user_id', $user_id);
                 },
-                'latest5Comments',
+                'latest5Comments' => function ($query) {
+                    $query->with('user')->latest()->take(5);
+                } ,
             ])->latest()->paginate(20);
 
         return Inertia::render('Home', [

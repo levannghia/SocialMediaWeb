@@ -47,7 +47,6 @@ class PostController extends Controller
                     'mime' => $file->getMimeType(),
                     'size' => $file->getSize(),
                     'created_by' => $user->id,
-                    // 'created_at' => Carbon::now()
                 ]);
             }
 
@@ -178,7 +177,7 @@ class PostController extends Controller
         $comment = Comment::create([
             'post_id' => $post->id,
             'user_id' => auth()->id(),
-            'comment' => $data['comment'],
+            'comment' => nl2br($data['comment']),
         ]);
 
         return response(new CommentResource($comment), 201);
