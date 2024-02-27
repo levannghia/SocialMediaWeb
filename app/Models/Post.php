@@ -40,6 +40,6 @@ class Post extends Model
     }
 
     public function latest5Comments(){
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comment::class)->with('user');
     }
 }

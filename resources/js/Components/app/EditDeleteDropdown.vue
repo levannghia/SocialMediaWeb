@@ -5,14 +5,23 @@ import {
   TrashIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/vue/20/solid";
+import { usePage } from "@inertiajs/vue3";
+
+const authUser = usePage().props.auth.user
 const emit = defineEmits(['edit', 'delete']);
 
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true
+    }
+})
 </script>
 
 <template>
-    <Menu as="div" class="relative inline-block text-left z-10">
+    <Menu as="div" class="relative inline-block text-left">
         <div>
-            <MenuButton class="w-8 h-8 rounded-full hover:bg-black/10 transition flex items-center justify-center">
+            <MenuButton class="w-8 h-8 rounded-full z-10 hover:bg-black/10 transition flex items-center justify-center">
                 <EllipsisVerticalIcon class="w-5 h-5" />
             </MenuButton>
         </div>
@@ -21,9 +30,9 @@ const emit = defineEmits(['edit', 'delete']);
             enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in"
             leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
             <MenuItems
-                class="absolute right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
+                class="absolute z-20 right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
                 <div class="px-1 py-1">
-                    <MenuItem v-slot="{ active }">
+                    <MenuItem v-if="props.user.id === authUser.id" v-slot="{ active }">
                     <button @click="emit('edit')" :class="[
                         active ? 'bg-violet-500 text-white' : 'text-gray-900',
                         'group flex w-full items-center rounded-md px-2 py-2 text-sm',
@@ -32,7 +41,7 @@ const emit = defineEmits(['edit', 'delete']);
                         Edit
                     </button>
                     </MenuItem>
-                    <MenuItem v-slot="{ active }">
+                    <MenuItem v-if="props.user.id === authUser.id" v-slot="{ active }">
                     <button @click="emit('delete')" :class="[
                         active ? 'bg-violet-500 text-white' : 'text-gray-900',
                         'group flex w-full items-center rounded-md px-2 py-2 text-sm',

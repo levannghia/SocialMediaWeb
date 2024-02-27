@@ -19,7 +19,8 @@ const props = defineProps({
   post: Object,
 });
 
-const newCommentText = ref('')
+const newCommentText = ref('');
+const editingComment = ref(null);
 
 const authUser = usePage().props.auth.user;
 
@@ -61,9 +62,25 @@ function createComment() {
     })
 }
 
-function editComment(data) {
-  console.log(data);
-  axiosClient.put(route('comment.update', data.id), {
+function startCommentEdit() {
+
+}
+
+function deleteComment(comment) {
+  if (!window.confirm('Bạn có chắc muốn xóa bình luận này?')) {
+    return false;
+  }
+
+  axiosClient.delete(route('comment.delete', comment.id)).then(({ data }) => {
+    props.post.comments = props.post.comments.filter(c => c.id != comment.id);
+    props.post.num_of_comment--;
+  });
+
+}
+
+function editComment(comment) {
+  console.log(comment);
+  axiosClient.put(route('comment.update', comment.id), {
     comment: "qwwwwww",
   })
 }
@@ -74,7 +91,7 @@ function editComment(data) {
     <div class="flex items-center justify-between">
       <PostUserHeader :post="post" :showTime="true" />
 
-      <EditDeleteDropdown @edit="openEditModal" @delete="deletePost" />
+      <EditDeleteDropdown :user="post.user" @edit="openEditModal" @delete="deletePost" />
     </div>
     <div>
       <ReadMoreReadLess :content="post.body" />
@@ -151,7 +168,7 @@ function editComment(data) {
                   <small class="text-gray-400 text-xs">{{ post.updated_at }}</small>
                 </div>
               </div>
-              <EditDeleteDropdown @edit="editComment(comment)" @delete=""/>
+              <EditDeleteDropdown :user="comment.user" @edit="editComment(comment)" @delete="deleteComment(comment)" />
             </div>
             <ReadMoreReadLess :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm" />
           </div>

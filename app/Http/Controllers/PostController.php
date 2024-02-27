@@ -190,6 +190,18 @@ class PostController extends Controller
         dd($data);
     }
 
+    public function deleteComment(Comment $comment) {
+        $post = $comment->post;
+        
+        if($comment->user_id != $post->user_id){
+            return response('Bạn không có quyền xóa bình luận', 403);
+        }
+
+        $comment->delete();
+
+        return response('', 204);
+    }
+
     /**
      * Remove the specified resource from storage.
      */
