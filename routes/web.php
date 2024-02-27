@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/post/download/{attachment}', [PostController::class, 'downloadAttachment'])->name('post.download');
     Route::post('/post/{post}/reaction', [PostController::class, 'postReaction'])->name('post.reaction');
     Route::post('/post/{post}/comment', [PostController::class, 'postCreateComment'])->name('post.comment.create');
+    Route::put('/comment/{comment}', [PostController::class, 'updateComment'])->name('comment.update');
 });
 
 require __DIR__.'/auth.php';

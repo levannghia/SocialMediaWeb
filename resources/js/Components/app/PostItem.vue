@@ -1,12 +1,7 @@
 <script setup>
-import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
+import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import { ChatBubbleLeftRightIcon, HandThumbUpIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
-import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import {
-  ChevronDownIcon,
-  PencilIcon,
-  TrashIcon,
-  EllipsisVerticalIcon,
   PaperClipIcon
 } from "@heroicons/vue/20/solid";
 import PostUserHeader from "@/Components/app/PostUserHeader.vue"
@@ -18,6 +13,7 @@ import axiosClient from "@/axiosClient";
 import InputTextarea from "../InputTextarea.vue";
 import IndigoButton from "./IndigoButton.vue";
 import ReadMoreReadLess from "@/Components/app/ReadMoreReadLess.vue"
+import EditDeleteDropdown from "./EditDeleteDropdown.vue";
 
 const props = defineProps({
   post: Object,
@@ -64,6 +60,13 @@ function createComment() {
       props.post.num_of_comment++;
     })
 }
+
+function editComment(data) {
+  console.log(data);
+  axiosClient.put(route('comment.update', data.id), {
+    comment: "qwwwwww",
+  })
+}
 </script>
 
 <template>
@@ -71,44 +74,10 @@ function createComment() {
     <div class="flex items-center justify-between">
       <PostUserHeader :post="post" :showTime="true" />
 
-      <Menu as="div" class="relative inline-block text-left z-10">
-        <div>
-          <MenuButton class="w-8 h-8 rounded-full hover:bg-black/10 transition flex items-center justify-center">
-            <EllipsisVerticalIcon class="w-5 h-5" />
-          </MenuButton>
-        </div>
-
-        <transition enter-active-class="transition duration-100 ease-out" enter-from-class="transform scale-95 opacity-0"
-          enter-to-class="transform scale-100 opacity-100" leave-active-class="transition duration-75 ease-in"
-          leave-from-class="transform scale-100 opacity-100" leave-to-class="transform scale-95 opacity-0">
-          <MenuItems
-            class="absolute right-0 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none">
-            <div class="px-1 py-1">
-              <MenuItem v-slot="{ active }">
-              <button @click="openEditModal" :class="[
-                active ? 'bg-violet-500 text-white' : 'text-gray-900',
-                'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-              ]">
-                <PencilIcon class="mr-2 h-5 w-5 text-violet-400" aria-hidden="true" />
-                Edit
-              </button>
-              </MenuItem>
-              <MenuItem v-slot="{ active }">
-              <button @click="deletePost" :class="[
-                active ? 'bg-violet-500 text-white' : 'text-gray-900',
-                'group flex w-full items-center rounded-md px-2 py-2 text-sm',
-              ]">
-                <TrashIcon class="mr-2 h-5 w-5 text-violet-400" aria-hidden="true" />
-                Delete
-              </button>
-              </MenuItem>
-            </div>
-          </MenuItems>
-        </transition>
-      </Menu>
+      <EditDeleteDropdown @edit="openEditModal" @delete="deletePost" />
     </div>
     <div>
-      <ReadMoreReadLess :content="post.body"/>
+      <ReadMoreReadLess :content="post.body" />
     </div>
 
     <div class="grid gap-3 mb-3" :class="post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
@@ -169,19 +138,22 @@ function createComment() {
         </div>
         <div>
           <div v-for="comment in props.post.comments" :key="comment.id" class="mb-3">
-            <div class="flex items-center gap-2">
-              <a href="javascript:void(0)">
-                <img :src="comment.user.avatar_url" alt=""
-                  class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all" />
-              </a>
-              <div>
-                <h4 class="font-bold">
-                  <a href="javascript:void(0)" class="hover:underline">{{ comment.user.name }}</a>
-                </h4>
-                <small class="text-gray-400 text-xs">{{ post.updated_at }}</small>
+            <div class="flex justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <a href="javascript:void(0)">
+                  <img :src="comment.user.avatar_url" alt=""
+                    class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all" />
+                </a>
+                <div>
+                  <h4 class="font-bold">
+                    <a href="javascript:void(0)" class="hover:underline">{{ comment.user.name }}</a>
+                  </h4>
+                  <small class="text-gray-400 text-xs">{{ post.updated_at }}</small>
+                </div>
               </div>
+              <EditDeleteDropdown @edit="editComment(comment)" @delete=""/>
             </div>
-            <ReadMoreReadLess :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm"/>
+            <ReadMoreReadLess :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm" />
           </div>
         </div>
       </DisclosurePanel>

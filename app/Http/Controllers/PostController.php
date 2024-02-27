@@ -10,6 +10,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Models\PostAttachment;
 use App\Models\PostReaction;
+use App\Http\Requests\UpdateCommentRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -181,6 +182,12 @@ class PostController extends Controller
         ]);
 
         return response(new CommentResource($comment), 201);
+    }
+
+    public function updateComment(UpdateCommentRequest $request, Comment $comment){
+        $data = $request->validated();
+
+        dd($data);
     }
 
     /**
