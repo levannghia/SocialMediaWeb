@@ -18,6 +18,8 @@ class CommentResource extends JsonResource
         return [
             'id' => $this->id,
             'comment' => $this->comment,
+            'num_of_reaction' => $this->reactions_count,
+            'current_user_has_reaction' => $this->reactions->count() > 0,
             'user' => [
                 "id" => $this->user->id,
                 "name" => $this->user->name,

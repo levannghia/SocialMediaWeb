@@ -24,4 +24,9 @@ class Comment extends Model
     {
         return $this->belongsTo(Post::class);
     }
+
+    public function reactions()
+    {
+        return $this->morphMany(Reaction::class, 'object');
+    }
 }

@@ -31,14 +31,18 @@ class Post extends Model
         return $this->hasMany(PostAttachment::class)->latest();
     }
 
-    public function reactions(){
-        return $this->hasMany(PostReaction::class);
-    }
+    // public function reactions(){
+    //     return $this->hasMany(Reaction::class);
+    // }
 
     public function comments(){
         return $this->hasMany(Comment::class);
     }
 
+    public function reactions()
+    {
+        return $this->morphMany(Reaction::class, 'object');
+    }
     public function latest5Comments(){
         return $this->hasMany(Comment::class)->with('user');
     }

@@ -23,7 +23,7 @@ class PostResource extends JsonResource
             'num_of_reaction' => $this->reactions_count,
             'current_user_has_reaction' => $this->reactions->count() > 0,
             'num_of_comment' => $this->comments_count,
-            'comments' => CommentResource::collection($this->whenLoaded('latest5Comments')),
+            'comments' => CommentResource::collection($this->whenLoaded('comments')),
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->diffForHumans(),
         ];

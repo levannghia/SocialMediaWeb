@@ -9,7 +9,7 @@ use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\PostAttachment;
-use App\Models\PostReaction;
+use App\Models\Reaction;
 use App\Http\Requests\UpdateCommentRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -137,31 +137,62 @@ class PostController extends Controller
         // dd($path);
 
         // if(Storage::disk('public')->exists($path)){
-            return response()->download(Storage::disk('public')->path($attachment->path), $attachment->name);
+        return response()->download(Storage::disk('public')->path($attachment->path), $attachment->name);
         // }
     }
 
-    public function postReaction(Request $request, Post $post) 
+    public function postReaction(Request $request, Post $post)
     {
         $data = $request->validate([
             'reaction' => [Rule::enum(PostReactionEnum::class)]
         ]);
 
-        $reaction  = PostReaction::where('post_id', $post->id)->where('user_id', auth()->id())->first();
+        $reaction  = Reaction::where('object_id', $post->id)
+            ->where('object_type', Post::class)
+            ->where('user_id', auth()->id())->first();
 
-        if($reaction){
+        if ($reaction) {
             $hasReaction = false;
             $reaction->delete();
-        }else{
+        } else {
             $hasReaction = true;
-            PostReaction::create([
-                'post_id' => $post->id,
+            $post->reactions()->create([
                 'user_id' => auth()->id(),
                 'type' => $data['reaction'],
             ]);
         }
-        
-        $reaction  = PostReaction::where('post_id', $post->id)->count();
+
+        $reaction  = Reaction::where('object_id', $post->id)
+            ->where('object_type', Post::class)->count();
+
+        return response([
+            'num_of_reaction' => $reaction,
+            'current_user_has_reaction' => $hasReaction,
+        ]);
+    }
+
+    public function commentReaction(Request $request, Comment $comment){
+        $data = $request->validate([
+            'reaction' => [Rule::enum(PostReactionEnum::class)]
+        ]);
+
+        $reaction  = Reaction::where('object_id', $comment->id)
+            ->where('object_type', Comment::class)
+            ->where('user_id', auth()->id())->first();
+
+        if ($reaction) {
+            $hasReaction = false;
+            $reaction->delete();
+        } else {
+            $hasReaction = true;
+            $comment->reactions()->create([
+                'user_id' => auth()->id(),
+                'type' => $data['reaction'],
+            ]);
+        }
+
+        $reaction  = Reaction::where('object_id', $comment->id)
+            ->where('object_type', Comment::class)->count();
 
         return response([
             'num_of_reaction' => $reaction,
@@ -184,7 +215,8 @@ class PostController extends Controller
         return response(new CommentResource($comment), 201);
     }
 
-    public function updateComment(UpdateCommentRequest $request, Comment $comment){
+    public function updateComment(UpdateCommentRequest $request, Comment $comment)
+    {
         $data = $request->validated();
         $comment->update([
             'comment' => nl2br($data['comment']),
@@ -193,10 +225,11 @@ class PostController extends Controller
         return response(new CommentResource($comment), 201);
     }
 
-    public function deleteComment(Comment $comment) {
+    public function deleteComment(Comment $comment)
+    {
         $post = $comment->post;
-        
-        if($comment->user_id != $post->user_id){
+
+        if ($comment->user_id != $post->user_id) {
             return response('Bạn không có quyền xóa bình luận', 403);
         }
 

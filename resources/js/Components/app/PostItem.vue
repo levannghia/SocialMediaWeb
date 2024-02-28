@@ -1,6 +1,6 @@
 <script setup>
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
-import { ChatBubbleLeftRightIcon, HandThumbUpIcon, ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
+import { ChatBubbleLeftRightIcon, HandThumbUpIcon, ArrowDownTrayIcon, ChatBubbleLeftEllipsisIcon } from '@heroicons/vue/24/outline'
 import {
   PaperClipIcon
 } from "@heroicons/vue/20/solid";
@@ -85,17 +85,25 @@ function deleteComment(comment) {
 function updateComment() {
   axiosClient.put(route('comment.update', editingComment.value.id), {
     comment: editingComment.value.comment,
-  }).then(({data}) => {
+  }).then(({ data }) => {
     editingComment.value = null;
     props.post.comments = props.post.comments.map((c) => {
-      if(c.id == data.id){
+      if (c.id == data.id) {
         return data;
       }
       return c;
     });
-
-   
   })
+}
+
+function sendCommetReaction(comment) {
+  axiosClient.post(route('comment.reaction', comment.id), {
+    reaction: 'like',
+  })
+    .then(({ data }) => {
+      comment.num_of_reaction = data.num_of_reaction;
+      comment.current_user_has_reaction = data.current_user_has_reaction;
+    })
 }
 </script>
 
@@ -184,17 +192,37 @@ function updateComment() {
               <EditDeleteDropdown :user="comment.user" @edit="startCommentEdit(comment)"
                 @delete="deleteComment(comment)" />
             </div>
-            <div v-if="editingComment && editingComment.id == comment.id">
-              <InputTextarea v-model="editingComment.comment" rows="1"
-                class="w-full max-h-[160px] resize-none ml-12" placeholder="Enter your comment here" />
-              <div class="flex gap-2 justify-end">
-                <button @click="editingComment = null" class="rounded-r-none text-indigo-500">cancel
+            <div class="pl-12">
+              <div v-if="editingComment && editingComment.id == comment.id">
+                <InputTextarea v-model="editingComment.comment" rows="1" class="w-full max-h-[160px] resize-none"
+                  placeholder="Enter your comment here" />
+                <div class="flex gap-2 justify-end">
+                  <button @click="editingComment = null" class="rounded-r-none text-indigo-500">cancel
+                  </button>
+                  <IndigoButton @click="updateComment" class="w-[100px]">update
+                  </IndigoButton>
+                </div>
+              </div>
+              <ReadMoreReadLess v-else :content="comment.comment" contentClass="flex flex-1 text-sm" />
+              <div class="mt-1 flex gap-2">
+                <button @click="sendCommetReaction(comment)"
+                  class="flex items-center text-xs text-indigo-500 py-0.5 px-1  rounded-lg"
+                  :class="[
+            comment.current_user_has_reaction ?
+              'bg-indigo-50 hover:bg-indigo-100' :
+              'hover:bg-indigo-50'
+          ]"
+                  >
+                  <HandThumbUpIcon class="w-3 h-3 mr-2" />
+                  {{ comment.num_of_reaction }}
+                  {{ comment.current_user_has_reaction ? 'Unlike' : 'Like' }}
                 </button>
-                <IndigoButton @click="updateComment" class="w-[100px]">update
-                </IndigoButton>
+                <button class="flex items-center text-xs text-indigo-500 py-0.5 px-1 hover:bg-indigo-100 rounded-lg">
+                  <ChatBubbleLeftEllipsisIcon class="w-3 h-3 mr-2" />
+                  Reply
+                </button>
               </div>
             </div>
-            <ReadMoreReadLess v-else :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm" />
           </div>
         </div>
       </DisclosurePanel>
