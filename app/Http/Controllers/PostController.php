@@ -186,8 +186,11 @@ class PostController extends Controller
 
     public function updateComment(UpdateCommentRequest $request, Comment $comment){
         $data = $request->validated();
+        $comment->update([
+            'comment' => nl2br($data['comment']),
+        ]);
 
-        dd($data);
+        return response(new CommentResource($comment), 201);
     }
 
     public function deleteComment(Comment $comment) {

@@ -62,8 +62,12 @@ function createComment() {
     })
 }
 
-function startCommentEdit() {
-
+function startCommentEdit(comment) {
+  // editingComment.value = comment;
+  editingComment.value = {
+    id: comment.id,
+    comment: comment.comment.replace(/<br\s*\/?>/gi, '\n') // <br />, <br > <br> <br/>, <br    />
+  }
 }
 
 function deleteComment(comment) {
@@ -78,10 +82,19 @@ function deleteComment(comment) {
 
 }
 
-function editComment(comment) {
-  console.log(comment);
-  axiosClient.put(route('comment.update', comment.id), {
-    comment: "qwwwwww",
+function updateComment() {
+  axiosClient.put(route('comment.update', editingComment.value.id), {
+    comment: editingComment.value.comment,
+  }).then(({data}) => {
+    editingComment.value = null;
+    props.post.comments = props.post.comments.map((c) => {
+      if(c.id == data.id){
+        return data;
+      }
+      return c;
+    });
+
+   
   })
 }
 </script>
@@ -168,9 +181,20 @@ function editComment(comment) {
                   <small class="text-gray-400 text-xs">{{ post.updated_at }}</small>
                 </div>
               </div>
-              <EditDeleteDropdown :user="comment.user" @edit="editComment(comment)" @delete="deleteComment(comment)" />
+              <EditDeleteDropdown :user="comment.user" @edit="startCommentEdit(comment)"
+                @delete="deleteComment(comment)" />
             </div>
-            <ReadMoreReadLess :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm" />
+            <div v-if="editingComment && editingComment.id == comment.id">
+              <InputTextarea v-model="editingComment.comment" rows="1"
+                class="w-full max-h-[160px] resize-none ml-12" placeholder="Enter your comment here" />
+              <div class="flex gap-2 justify-end">
+                <button @click="editingComment = null" class="rounded-r-none text-indigo-500">cancel
+                </button>
+                <IndigoButton @click="updateComment" class="w-[100px]">update
+                </IndigoButton>
+              </div>
+            </div>
+            <ReadMoreReadLess v-else :content="comment.comment" contentClass="flex flex-1 ml-12 text-sm" />
           </div>
         </div>
       </DisclosurePanel>
