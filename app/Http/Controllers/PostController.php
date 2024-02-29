@@ -203,7 +203,7 @@ class PostController extends Controller
     public function postCreateComment(Request $request, Post $post)
     {
         $data = $request->validate([
-            'comment' => ['required']
+            'comment' => ['required', "string"]
         ]);
 
         $comment = Comment::create([

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('reactions', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('object_id');
+            $table->unsigned('object_id');
             $table->stringr('object_type');
             $table->string('type'); // like, dislike, sad, laugh
             $table->foreignId('user_id')->constrained('users');
