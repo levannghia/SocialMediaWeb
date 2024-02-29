@@ -45,6 +45,6 @@ function onModalHide() {
   <div class="flex-1 overflow-auto">
     <PostItem v-for="post in posts" :key="post.id" :post="post" @editClick="openEditModal" @attachmentClick="openAttachmentModalPreview"/>
     <PostModal :post="editPost" v-model="showEditModal" @hide="onModalHide"/>
-    <AttachmentPreviewModal :attachments="previewAttachmentPost.post?.attachments" v-model:index="previewAttachmentPost.index" v-model="showAttachmentModal"/>
+    <AttachmentPreviewModal :attachments="previewAttachmentPost.post?.attachments || []" v-model:index="previewAttachmentPost.index" v-model="showAttachmentModal"/>
   </div>
 </template>

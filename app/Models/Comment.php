@@ -12,7 +12,8 @@ class Comment extends Model
     protected $fillable = [
         'comment',
         'user_id',
-        'post_id'
+        'post_id',
+        'parent_id'
     ];
 
     public function user()
@@ -28,5 +29,10 @@ class Comment extends Model
     public function reactions()
     {
         return $this->morphMany(Reaction::class, 'object');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 }

@@ -26,6 +26,7 @@ class CommentResource extends JsonResource
                 "username" => $this->user->username,
                 "avatar_url" => $this->user->avatar_path ? Storage::url($this->user->avatar_path) : '/images/user_default.png',
             ],
+            'comments' => CommentResource::collection($this->whenLoaded('comments')),
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->diffForHumans(),
         ];
