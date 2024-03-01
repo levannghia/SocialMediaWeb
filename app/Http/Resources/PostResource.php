@@ -23,9 +23,25 @@ class PostResource extends JsonResource
             'num_of_reaction' => $this->reactions_count,
             'current_user_has_reaction' => $this->reactions->count() > 0,
             'num_of_comment' => $this->comments_count,
-            'comments' => CommentResource::collection($this->whenLoaded('comments')),
+            'comments' => self::convertCommentsIntoTree($this->comments),
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->diffForHumans(),
         ];
     }
+
+    private static function convertCommentsIntoTree($comments, $parent_id = null)
+    {
+        $commentTree = [];
+
+        foreach($comments as $comment){
+            if($comment->parent_id === $parent_id){
+                $children = self::convertCommentsIntoTree($comments, $comment->id);
+                $comment->childOfComments = $children;
+
+                $commentTree[] = new CommentResource($comment);
+            }
+        }
+
+        return $commentTree;
+    } 
 }

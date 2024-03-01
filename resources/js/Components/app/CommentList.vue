@@ -88,23 +88,20 @@ function sendCommentReaction(comment) {
 </script>
 
 <template>
-    <div v-if="authUser">
-        <div class="flex items-center gap-2 mb-3">
-            <Link :href="route('profile', authUser.username)">
-                <img :src="authUser.avatar_url" alt=""
-                    class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all" />
-            </Link>
-            <div class="flex flex-1">
-                <InputTextarea v-model="newCommentText" rows="1" class="w-full max-h-[160px] resize-none rounded-r-none"
-                    placeholder="Enter your comment here" />
-                <IndigoButton @click="createComment" class="rounded-l-none w-[100px]">Submit</IndigoButton>
-            </div>
+    <div v-if="authUser" class="flex gap-2 mb-3">
+        <Link :href="route('profile', authUser.username)">
+        <img :src="authUser.avatar_url" class="w-[40px] rounded-full border-2 transition-all hover:border-blue-500" />
+        </Link>
+        <div class="flex flex-1">
+            <InputTextarea v-model="newCommentText" placeholder="Enter your comment here" rows="1"
+                class="w-full max-h-[160px] resize-none rounded-r-none"></InputTextarea>
+            <IndigoButton @click="createComment" class="rounded-l-none w-[100px] ">Submit</IndigoButton>
         </div>
     </div>
     <div>
-        <div v-for="comment in data.comments" :key="comment.id" class="mb-4">
+        <div v-for="comment of data.comments" :key="comment.id" class="mb-4">
             <div class="flex justify-between gap-2">
-                <div class="flex items-center gap-2">
+                <div class="flex gap-2">
                     <a href="javascript:void(0)">
                         <img :src="comment.user.avatar_url" alt=""
                             class="w-[40px] h-[40px] rounded-full border-2 hover:border-blue-500 transition-all" />
@@ -119,18 +116,19 @@ function sendCommentReaction(comment) {
                 <EditDeleteDropdown :user="comment.user" @edit="startCommentEdit(comment)"
                     @delete="deleteComment(comment)" />
             </div>
-            <Disclosure>
-                <div class="pl-12">
-                    <div v-if="editingComment && editingComment.id == comment.id">
-                        <InputTextarea v-model="editingComment.comment" rows="1" class="w-full max-h-[160px] resize-none"
-                            placeholder="Enter your comment here" />
-                        <div class="flex gap-2 justify-end">
-                            <button @click="editingComment = null" class="rounded-r-none text-indigo-500">cancel
-                            </button>
-                            <IndigoButton @click="updateComment" class="w-[100px]">update</IndigoButton>
-                        </div>
+
+            <div class="pl-12">
+                <div v-if="editingComment && editingComment.id == comment.id">
+                    <InputTextarea v-model="editingComment.comment" rows="1" class="w-full max-h-[160px] resize-none"
+                        placeholder="Enter your comment here" />
+                    <div class="flex gap-2 justify-end">
+                        <button @click="editingComment = null" class="rounded-r-none text-indigo-500">cancel
+                        </button>
+                        <IndigoButton @click="updateComment" class="w-[100px]">update</IndigoButton>
                     </div>
-                    <ReadMoreReadLess v-else :content="comment.comment" contentClass="flex flex-1 text-sm" />
+                </div>
+                <ReadMoreReadLess v-else :content="comment.comment" contentClass="flex flex-1 text-sm" />
+                <Disclosure>
                     <div class="mt-1 flex gap-2">
                         <button @click="sendCommentReaction(comment)"
                             class="flex items-center text-xs text-indigo-500 py-0.5 px-1  rounded-lg" :class="[
@@ -150,10 +148,10 @@ function sendCommentReaction(comment) {
                         </DisclosureButton>
                     </div>
                     <DisclosurePanel>
-                        <CommentList :post="post" :data="{ comments: comment.comments }" :parentComment="comment" />
+                        <CommentList :post="post" :data="{ comments: comment.comments }" :parent-comment="comment" />
                     </DisclosurePanel>
-                </div>
-            </Disclosure>
+                </Disclosure>
+            </div>
         </div>
         <div v-if="!data.comments.length" class="py-4 text-center dark:text-gray-100">
             There are no comments.
