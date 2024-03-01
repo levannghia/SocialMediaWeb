@@ -19,6 +19,7 @@ class CommentResource extends JsonResource
             'id' => $this->id,
             'comment' => $this->comment,
             'num_of_reaction' => $this->reactions_count,
+            'num_of_comment' => $this->comments_count,
             'current_user_has_reaction' => $this->reactions->count() > 0,
             'user' => [
                 "id" => $this->user->id,
@@ -26,7 +27,7 @@ class CommentResource extends JsonResource
                 "username" => $this->user->username,
                 "avatar_url" => $this->user->avatar_path ? Storage::url($this->user->avatar_path) : '/images/user_default.png',
             ],
-            'comments' => CommentResource::collection($this->whenLoaded('comments')),
+            'comments' => CommentResource::collection($this->comments),
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->diffForHumans(),
         ];

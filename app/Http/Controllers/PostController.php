@@ -214,7 +214,7 @@ class PostController extends Controller
             'comment' => nl2br($data['comment']),
         ]);
 
-        return response(new CommentResource($comment), 201);
+        return new CommentResource($comment);
     }
 
     public function updateComment(UpdateCommentRequest $request, Comment $comment)
@@ -224,7 +224,7 @@ class PostController extends Controller
             'comment' => nl2br($data['comment']),
         ]);
 
-        return response(new CommentResource($comment), 201);
+        return new CommentResource($comment);
     }
 
     public function deleteComment(Comment $comment)
