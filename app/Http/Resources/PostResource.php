@@ -22,7 +22,7 @@ class PostResource extends JsonResource
             'attachments' => PostAttachmentResource::collection($this->whenLoaded('attachments')),
             'num_of_reaction' => $this->reactions_count,
             'current_user_has_reaction' => $this->reactions->count() > 0,
-            'num_of_comment' => $this->comments_count,
+            'num_of_comment' => $this->numOfComments,
             'comments' => self::convertCommentsIntoTree($this->comments),
             'created_at' => $this->created_at->diffForHumans(),
             'updated_at' => $this->updated_at->diffForHumans(),
@@ -37,7 +37,7 @@ class PostResource extends JsonResource
             if($comment->parent_id === $parent_id){
                 $children = self::convertCommentsIntoTree($comments, $comment->id);
                 $comment->childOfComments = $children;
-
+                $comment->numOfComments = collect($children)->sum('numOfComments') + count($children);
                 $commentTree[] = new CommentResource($comment);
             }
         }

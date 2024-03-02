@@ -88,9 +88,9 @@ function sendCommentReaction(comment) {
 </script>
 
 <template>
-    <div v-if="authUser" class="flex gap-2 mb-3">
+    <div v-if="authUser" class="flex gap-2 mb-3 mt-3">
         <Link :href="route('profile', authUser.username)">
-        <img :src="authUser.avatar_url" class="w-[40px] rounded-full border-2 transition-all hover:border-blue-500" />
+        <img :src="authUser.avatar_url" class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500" />
         </Link>
         <div class="flex flex-1">
             <InputTextarea v-model="newCommentText" placeholder="Enter your comment here" rows="1"
