@@ -22,6 +22,7 @@ const newCommentText = ref('');
 const editingComment = ref(null);
 
 const authUser = usePage().props.auth.user;
+const emit = defineEmits(['commentCreate', 'commentDelete']);
 
 function createComment() {
     axiosClient.post(route('post.comment.create', props.post), {
@@ -29,12 +30,14 @@ function createComment() {
         parent_id: props.parentComment?.id || null,
     })
         .then(({ data }) => {
+            console.log(data);
             newCommentText.value = '';
             props.data.comments.unshift(data);
             if (props.parentComment) {
                 props.parentComment.num_of_comment++;
             }
             props.post.num_of_comment++;
+            emit('commentCreate', data)
         })
 }
 
@@ -53,12 +56,13 @@ function deleteComment(comment) {
     axiosClient.delete(route('comment.delete', comment.id)).then(({ data }) => {
         const commentIndex = props.data.comments.findIndex(c => c.id === comment.id);
         props.data.comments.splice(commentIndex, 1);
-        console.log(props.data.comments);
+        // console.log(props.data.comments);
         // props.comments = props.comments.filter(c => c.id != comment.id);
         if (props.parentComment) {
             props.parentComment.num_of_comment--;
         }
         props.post.num_of_comment--;
+        emit('commentDelete', comment)
     });
 
 }
@@ -85,12 +89,27 @@ function sendCommentReaction(comment) {
             comment.current_user_has_reaction = data.current_user_has_reaction;
         })
 }
+
+function onCommentCreate(comment) {
+    if (props.parentComment) {
+        props.parentComment.num_of_comments++;
+    }
+    emit('commentCreate', comment)
+}
+
+function onCommentDelete(comment) {
+    if (props.parentComment) {
+        props.parentComment.num_of_comments--;
+    }
+    emit('commentDelete', comment)
+}
 </script>
 
 <template>
     <div v-if="authUser" class="flex gap-2 mb-3 mt-3">
         <Link :href="route('profile', authUser.username)">
-        <img :src="authUser.avatar_url" class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500" />
+        <img :src="authUser.avatar_url"
+            class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500" />
         </Link>
         <div class="flex flex-1">
             <InputTextarea v-model="newCommentText" placeholder="Enter your comment here" rows="1"
@@ -148,7 +167,8 @@ function sendCommentReaction(comment) {
                         </DisclosureButton>
                     </div>
                     <DisclosurePanel>
-                        <CommentList :post="post" :data="{ comments: comment.comments }" :parent-comment="comment" />
+                        <CommentList :post="post" :data="{ comments: comment.comments }" :parent-comment="comment"
+                            @comment-create="onCommentCreate" @comment-delete="onCommentDelete" />
                     </DisclosurePanel>
                 </Disclosure>
             </div>

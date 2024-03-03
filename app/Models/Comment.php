@@ -10,7 +10,7 @@ class Comment extends Model
     use HasFactory;
 
     public int $numOfComments = 0;
-    public Array $childOfComments = [];
+    public Array $childComments = [];
     
     protected $fillable = [
         'comment',
