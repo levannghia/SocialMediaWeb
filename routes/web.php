@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -42,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/comment/{comment}', [PostController::class, 'updateComment'])->name('comment.update');
     Route::delete('/comment/{comment}', [PostController::class, 'deleteComment'])->name('comment.delete');
     Route::post('/comment/{comment}/reaction', [PostController::class, 'commentReaction'])->name('comment.reaction');
+
+    //Group
+
+    Route::post('/group', [GroupController::class, 'store'])->name('group.store');
 });
 
 require __DIR__.'/auth.php';

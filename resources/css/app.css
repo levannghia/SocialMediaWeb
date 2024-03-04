@@ -109,3 +109,22 @@
     background-color: #eaf4ff;
     color: #4156e2;
 }
+
+/* WebKit browsers (Chrome, Safari) */
+.comment-list::-webkit-scrollbar-thumb {
+    width: 8px;
+    background-color: transparent;
+}
+
+.comment-list::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.comment-list:hover:-webkit-scrollbar-thumb {
+    background-color: #a2c3de; /* Thumb color */
+    border-radius: 6px;
+}
+
+.comment-list:hover::-webkit-scrollbar-track {
+    background-color: #f1f1f3; /* Track color */
+}

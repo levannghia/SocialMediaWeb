@@ -9,10 +9,10 @@ use Inertia\Inertia;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user_id = auth()->id();
-        $posts = Post::query()
+        $query = Post::query()
             ->withCount(['reactions', 'comments'])
             ->with([
                 'attachments', 'user', 'reactions' => function ($query) use ($user_id) {
@@ -28,10 +28,15 @@ class HomeController extends Controller
                             },
                         ]);
                 },
-            ])->latest()->paginate(20);
+            ])->latest()->paginate(10);
+            
+        $posts = PostResource::collection($query);
+        if ($request->wantsJson()) {
+            return $posts;
+        }
 
         return Inertia::render('Home', [
-            'posts' => PostResource::collection($posts),
+            'posts' => $posts,
         ]);
     }
 }
