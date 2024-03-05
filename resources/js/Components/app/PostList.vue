@@ -64,9 +64,7 @@ function loadMore() {
 
 onMounted(() => {
   const observer = new IntersectionObserver(
-    (entries) => entries.forEach(entry => {
-      entry.isIntersecting && loadMore()
-    }), {
+    (entries) => entries.forEach(entry => entry.isIntersecting && loadMore()), {
     rootMargin: '-250px 0px 0px 0px'
   });
 

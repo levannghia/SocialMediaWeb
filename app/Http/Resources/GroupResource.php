@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class GroupResource extends JsonResource
 {
@@ -25,7 +26,7 @@ class GroupResource extends JsonResource
             // 'cover_url' => $this->cover_path ? Storage::url($this->cover_path) : null,
             'auto_approval' => $this->auto_approval,
             'about' => $this->about,
-            // 'description' => Str::words(strip_tags($this->about), 10),
+            'description' => Str::words(strip_tags($this->about), 10),
             'user_id' => $this->user_id,
 //            'deleted_at' => $this->deleted_at,
 //            'deleted_by' => $this->deleted_by,
