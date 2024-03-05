@@ -14,6 +14,7 @@ defineProps({
     type: Object,
   }
 });
+
 </script>
 
 <template>
