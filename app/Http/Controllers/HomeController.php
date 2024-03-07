@@ -42,7 +42,9 @@ class HomeController extends Controller
                 ->join('group_users AS gu', 'gu.group_id', 'groups.id')
                 ->where('gu.user_id', auth()->id())
                 ->where('gu.status', GroupUserStatus::APPROVED->value)
+                ->latest()
                 ->get();
+                
         if ($request->wantsJson()) {
             return $posts;
         }
