@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Enums\GroupUserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Sluggable\HasSlug;
@@ -30,4 +31,15 @@ class Group extends Model
             ->doNotGenerateSlugsOnUpdate();
     }
 
+    public function currentUserGroup(){
+        return $this->hasOne(GroupUser::class)->where('user_id', auth()->id());
+    }
+
+    public function isAdmin(){
+        return GroupUser::query()
+        ->where('user_id', auth()->id())
+        ->wheres('group_id', $this->id)
+        ->where('role', GroupUserRole::ADMIN->value)
+        ->exists();;
+    }
 }

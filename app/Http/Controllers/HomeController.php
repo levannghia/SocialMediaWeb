@@ -38,11 +38,13 @@ class HomeController extends Controller
         $posts = PostResource::collection($query);
 
         $groups = Group::query()
-                ->select(['groups.*', 'gu.role', 'gu.status'])
+                ->select(['groups.*'])
+                ->with('currentUserGroup')
                 ->join('group_users AS gu', 'gu.group_id', 'groups.id')
                 ->where('gu.user_id', auth()->id())
-                ->where('gu.status', GroupUserStatus::APPROVED->value)
-                ->latest()
+                // ->where('gu.status', GroupUserStatus::APPROVED->value)
+                ->orderBy('gu.role')
+                ->orderBy('name', 'desc')
                 ->get();
                 
         if ($request->wantsJson()) {

@@ -9,15 +9,21 @@ use App\Http\Resources\GroupResource;
 use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
 use App\Models\GroupUser;
+use Inertia\Inertia;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function profile(Group $group)
     {
-        //
+        $group->load('currentUserGroup');
+        return Inertia::render('Group/View', [
+            'group' => new GroupResource($group),
+        ]);
     }
 
     /**
@@ -56,6 +62,47 @@ class GroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    public function updateImage(Request $request, Group $group)
+    {
+        if(!$group->isAdmin()){
+            return response('You don\'t have permission to perform this action', 403);
+        }
+
+        $data = $request->validate([
+            'avatar' => ['nullable', 'image'],
+            'cover' => ['nullable', 'image'],
+        ]);
+
+        $user = $request->user();
+
+        $avatar = $data['avatar'] ?? null;
+        $cover = $data['cover'] ?? null;
+        $success = '';
+
+        if ($cover) {
+            if ($group->cover_path) {
+                Storage::disk('public')->delete($group->cover_path);
+            }
+            $path = $cover->store('user-' . $group->id, 'public');
+            $group->update(['cover_path' => $path]);
+            $success = 'Your cover image was updated';
+        }
+
+        if ($avatar) {
+            if ($group->avatar_path) {
+                Storage::disk('public')->delete($group->avatar_path);
+            }
+            $path = $avatar->store('user-' . $group->id, 'public');
+            $group->update(['avatar_path' => $path]);
+            $success = 'Your avatar image was updated';
+        }
+
+        //        session('success', 'Cover image has been updated');
+
+        return back()->with('success', $success);
+    }
+
     public function update(UpdateGroupRequest $request, Group $group)
     {
         //
