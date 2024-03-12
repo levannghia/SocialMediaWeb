@@ -1,20 +1,20 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { XMarkIcon, BookmarkIcon } from '@heroicons/vue/24/solid'
-import { useForm } from "@inertiajs/vue3";
+import { useForm, usePage } from "@inertiajs/vue3";
 import axiosClient from "@/axiosClient.js";
-import GroupForm from "@/Components/app/GroupForm.vue";
 import BaseModal from "@/Components/app/BaseModal.vue";
+import TextInput from '../TextInput.vue';
 
 const props = defineProps({
     modelValue: Boolean
 })
 
+const page = usePage();
+
 const formErrors = ref({});
 const form = useForm({
-    name: '',
-    auto_approval: true,
-    about: '',
+    email: '',
 })
 
 const show = computed({
@@ -38,11 +38,15 @@ function resetModal() {
 }
 
 function submit() {
-    axiosClient.post(route('group.store'), form)
-        .then(({ data }) => {
-            closeModal()
-            emit('create', data)
-        })
+    form.post(route('group.inviteUsers', page.props.group.slug),{
+        onSuccess(res){
+            console.log(res);
+            closeModal();
+        },
+        onError(res){
+            console.log(res);
+        }
+    });
 }
 
 </script>
@@ -50,7 +54,10 @@ function submit() {
 <template>
     <BaseModal title="Create new Group" v-model="show" @hide="closeModal()">
         <div class="p-4 dark:text-gray-100">
-            <GroupForm :form="form" />
+            <div class="mb-3 dark:text-gray-100">
+                <label>Username or Email</label>
+                <TextInput type="text" class="mt-1 block w-full" v-model="form.email" required autofocus />
+            </div>
         </div>
 
         <div class="flex justify-end gap-2 py-3 px-4">

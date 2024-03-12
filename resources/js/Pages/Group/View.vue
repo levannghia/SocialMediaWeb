@@ -12,7 +12,7 @@
       <div class="relative bg-white group">
         <img :src="coverImageSrc || group.cover_url || '/images/defaut_cover_photo.jpg'" class="w-full h-[200px] object-cover" />
         <div class="absolute top-2 right-2">
-          <button v-if="!coverImageSrc"
+          <button v-if="isCurrentUserAdmin && !coverImageSrc"
             class="opacity-0 group-hover:opacity-100 transition-all flex items-center bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-sm">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
               stroke="currentColor" class="w-4 h-4 mr-2">
@@ -25,7 +25,7 @@
             <input type="file" class="absolute top-0 left-0 right-0 bottom-0 opacity-0 cursor-pointer"
               @change="onCoverChange" />
           </button>
-          <div v-else class="flex whitespace-nowrap gap-2 opacity-0 group-hover:opacity-100">
+          <div v-else-if="isCurrentUserAdmin" class="flex whitespace-nowrap gap-2 opacity-0 group-hover:opacity-100">
             <button @click="cancelCoverImage"
               class="transition-all flex items-center bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-sm">
               <XMarkIcon class="w-4 h-4" />
@@ -42,13 +42,13 @@
           <div
             class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full">
             <img :src="thumbnailImageSrc || group.thumbnail_url || '/images/user_default.png'" class="w-full h-full object-cover rounded-full" />
-            <button v-if="!thumbnailImageSrc"
+            <button v-if="isCurrentUserAdmin && !thumbnailImageSrc"
               class="absolute left-0 top-0 right-0 bottom-0 bg-black/50 text-gray-200 rounded-full opacity-0 flex items-center justify-center group-hover/avatar:opacity-100">
               <CameraIcon class="w-8 h-8" />
 
               <input type="file" class="absolute left-0 top-0 bottom-0 right-0 opacity-0" @change="onThumbnailChange" />
             </button>
-            <div v-else class="absolute top-1 right-0 flex flex-col gap-2">
+            <div v-else-if="isCurrentUserAdmin" class="absolute top-1 right-0 flex flex-col gap-2">
               <button @click="resetThumbnailImage"
                 class="w-7 h-7 flex items-center justify-center bg-red-500/80 text-white rounded-full">
                 <XMarkIcon class="h-5 w-5" />
@@ -61,7 +61,7 @@
           </div>
           <div class="flex-1 p-3 flex justify-between items-center">
             <h2 class="font-semibold text-lg">{{ group.name }}</h2>
-            <PrimaryButton v-if="isCurrentUserAdmin">Invite Users</PrimaryButton>
+            <PrimaryButton v-if="isCurrentUserAdmin" @click="showInviteUserModal = true">Invite Users</PrimaryButton>
             <PrimaryButton v-if="!group.role && group.auto_approval">Join To Group</PrimaryButton>
             <PrimaryButton v-if="!group.role && !group.auto_approval">Request To Join</PrimaryButton>
           </div>
@@ -100,6 +100,7 @@
       </div>
     </div>
   </AuthenticatedLayout>
+  <InviteUserModal v-model="showInviteUserModal"/>
 </template>
 
 <script setup>
@@ -111,6 +112,7 @@ import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 import Edit from "@/Pages/Profile/Edit.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { XMarkIcon, CheckIcon, CameraIcon, CheckCircleIcon } from "@heroicons/vue/24/solid";
+import InviteUserModal from "@/Components/app/InviteUserModal.vue";
 
 const authUser = usePage().props.auth.user;
 
@@ -136,6 +138,7 @@ const imageForm = useForm({
   cover: null,
 });
 
+const showInviteUserModal = ref(false);
 const showNotification = ref(true);
 const coverImageSrc = ref("");
 const thumbnailImageSrc = ref("");

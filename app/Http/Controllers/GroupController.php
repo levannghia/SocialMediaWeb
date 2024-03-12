@@ -8,10 +8,13 @@ use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\GroupResource;
 use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
+use App\Http\Requests\InviteUserRequest;
 use App\Models\GroupUser;
+use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class GroupController extends Controller
 {
@@ -22,6 +25,7 @@ class GroupController extends Controller
     {
         $group->load('currentUserGroup');
         return Inertia::render('Group/View', [
+            'success' => session('success'),
             'group' => new GroupResource($group),
         ]);
     }
@@ -99,6 +103,24 @@ class GroupController extends Controller
         // session('success', 'Cover image has been updated');
 
         return back()->with('success', $success);
+    }
+
+    public function inviteUsers(InviteUserRequest $request, Group $group)
+    {
+        $data = $request->validated();
+
+        $user = $request->user;
+        GroupUser::create([
+            'status' => GroupUserStatus::PENDING->value,
+            'role' => GroupUserRole::USER->value,
+            'token' => Str::random(256),
+            'token_expire_date' => Carbon::now()->addHours(24),
+            'user_id' => $user->id,
+            'group_id' => $group->id,
+            'created_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'User was invited to join to group');
     }
 
     public function update(UpdateGroupRequest $request, Group $group)

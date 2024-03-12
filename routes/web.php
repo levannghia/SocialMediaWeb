@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/group', [GroupController::class, 'store'])->name('group.store');
     Route::post('/group/update-image/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
+    Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
 });
 
 require __DIR__ . '/auth.php';
