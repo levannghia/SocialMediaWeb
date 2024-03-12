@@ -4,11 +4,9 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 // use Inertia\Inertia;
 // use Goutte\Client;
-use Illuminate\Support\Facades\Http;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +97,7 @@ Route::middleware('auth')->group(function () {
     //Group
 
     Route::post('/group', [GroupController::class, 'store'])->name('group.store');
+    Route::post('/group/update-image/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
 });
 
 require __DIR__ . '/auth.php';

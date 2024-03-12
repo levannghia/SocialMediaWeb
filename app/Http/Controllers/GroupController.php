@@ -70,13 +70,11 @@ class GroupController extends Controller
         }
 
         $data = $request->validate([
-            'avatar' => ['nullable', 'image'],
+            'thumbnail' => ['nullable', 'image'],
             'cover' => ['nullable', 'image'],
         ]);
 
-        $user = $request->user();
-
-        $avatar = $data['avatar'] ?? null;
+        $thumbnail = $data['thumbnail'] ?? null;
         $cover = $data['cover'] ?? null;
         $success = '';
 
@@ -84,21 +82,21 @@ class GroupController extends Controller
             if ($group->cover_path) {
                 Storage::disk('public')->delete($group->cover_path);
             }
-            $path = $cover->store('user-' . $group->id, 'public');
+            $path = $cover->store('group-' . $group->id, 'public');
             $group->update(['cover_path' => $path]);
             $success = 'Your cover image was updated';
         }
 
-        if ($avatar) {
-            if ($group->avatar_path) {
-                Storage::disk('public')->delete($group->avatar_path);
+        if ($thumbnail) {
+            if ($group->thumbnail_path) {
+                Storage::disk('public')->delete($group->thumbnail_path);
             }
-            $path = $avatar->store('user-' . $group->id, 'public');
-            $group->update(['avatar_path' => $path]);
-            $success = 'Your avatar image was updated';
+            $path = $thumbnail->store('group-' . $group->id, 'public');
+            $group->update(['thumbnail_path' => $path]);
+            $success = 'Your thumbnail image was updated';
         }
 
-        //        session('success', 'Cover image has been updated');
+        // session('success', 'Cover image has been updated');
 
         return back()->with('success', $success);
     }

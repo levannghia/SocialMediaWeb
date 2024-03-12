@@ -38,8 +38,8 @@ class Group extends Model
     public function isAdmin(){
         return GroupUser::query()
         ->where('user_id', auth()->id())
-        ->wheres('group_id', $this->id)
+        ->where('group_id', $this->id)
         ->where('role', GroupUserRole::ADMIN->value)
-        ->exists();;
+        ->exists();
     }
 }
