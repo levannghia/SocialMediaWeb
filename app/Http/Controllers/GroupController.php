@@ -10,6 +10,7 @@ use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\InviteUserRequest;
 use App\Models\GroupUser;
+use App\Notifications\InvitationInGroup;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
@@ -110,17 +111,32 @@ class GroupController extends Controller
         $data = $request->validated();
 
         $user = $request->user;
+        $groupUser = $request->groupUser;
+
+        if ($groupUser) {
+            $groupUser->delete();
+        }
+
+        $hours = 24;
+        $token = Str::random(256);
         GroupUser::create([
             'status' => GroupUserStatus::PENDING->value,
             'role' => GroupUserRole::USER->value,
-            'token' => Str::random(256),
-            'token_expire_date' => Carbon::now()->addHours(24),
+            'token' => $token,
+            'token_expire_date' => Carbon::now()->addHours($hours),
             'user_id' => $user->id,
             'group_id' => $group->id,
             'created_by' => auth()->id(),
         ]);
 
+        $user->notify(new InvitationInGroup($group, $hours, $token));
+
         return back()->with('success', 'User was invited to join to group');
+    }
+
+    public function approveInvitation(string $token)
+    {
+        
     }
 
     public function update(UpdateGroupRequest $request, Group $group)
