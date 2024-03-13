@@ -37,7 +37,7 @@ class InviteUserRequest extends FormRequest
                     $fail('User does not exits');
                 }
 
-                $this->groupUser = GroupUser::query()->where('user_id', $this->user->id)->where('group_id', $this->group->id)->first();
+                $this->groupUser = GroupUser::query()->where('user_id', $this->user?->id)->where('group_id', $this->group->id)->first();
 
                 if($this->groupUser && $this->groupUser->status === GroupUserStatus::APPROVED->value){
                     $fail('User does not exits');

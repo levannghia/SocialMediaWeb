@@ -61,9 +61,12 @@
           </div>
           <div class="flex-1 p-3 flex justify-between items-center">
             <h2 class="font-semibold text-lg">{{ group.name }}</h2>
-            <PrimaryButton v-if="isCurrentUserAdmin" @click="showInviteUserModal = true">Invite Users</PrimaryButton>
-            <PrimaryButton v-if="!group.role && group.auto_approval">Join To Group</PrimaryButton>
-            <PrimaryButton v-if="!group.role && !group.auto_approval">Request To Join</PrimaryButton>
+            <PrimaryButton v-if="!authUser" :href="route('login')">
+                                Login to join to this group
+                            </PrimaryButton>
+            <PrimaryButton v-if="authUser && isCurrentUserAdmin" @click="showInviteUserModal = true">Invite Users</PrimaryButton>
+            <PrimaryButton v-if="authUser && !group.role && group.auto_approval" @click="joinToGroup">Join To Group</PrimaryButton>
+            <PrimaryButton v-if="authUser && !group.role && !group.auto_approval">Request To Join</PrimaryButton>
           </div>
         </div>
       </div>
@@ -201,5 +204,9 @@ function submitThumbnailImage() {
       }, 5000);
     },
   });
+}
+
+function joinToGroup(){
+
 }
 </script>

@@ -44,7 +44,7 @@ function submit() {
             closeModal();
         },
         onError(res){
-            console.log(res);
+            formErrors.value = res
         }
     });
 }
@@ -56,7 +56,8 @@ function submit() {
         <div class="p-4 dark:text-gray-100">
             <div class="mb-3 dark:text-gray-100">
                 <label>Username or Email</label>
-                <TextInput type="text" class="mt-1 block w-full" v-model="form.email" required autofocus />
+                <TextInput type="text" class="mt-1 block w-full" :class="formErrors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''" v-model="form.email" required autofocus />
+                <div class="text-red-500 mt-2" v-if="formErrors">{{ formErrors.email }}</div>
             </div>
         </div>
 

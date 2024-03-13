@@ -148,7 +148,9 @@ class GroupController extends Controller
         }
 
         if($errorTitle){
-            return \inertia('Error', compact('errorTitle'));
+            return \inertia('Error', [
+                'title' => $errorTitle,
+            ]);
         }
 
         $groupUser->status = GroupUserStatus::APPROVED->value;

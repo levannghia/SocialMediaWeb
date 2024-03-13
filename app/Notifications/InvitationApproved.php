@@ -13,15 +13,11 @@ class InvitationApproved extends Notification
 {
     use Queueable;
 
-    public Group $group;
-    public User $user;
     /**
      * Create a new notification instance.
      */
-    public function __construct($group, $user)
+    public function __construct(public Group $group, public User $user)
     {
-        $this->group = $group;
-        $this->user = $user;
     }
 
     /**
