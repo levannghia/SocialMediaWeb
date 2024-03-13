@@ -20,4 +20,16 @@ class GroupUser extends Model
         'token',
         'token_expire_date',
     ];
+
+    public function adminUser(){
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function groups(){
+        return $this->belongsTo(Group::class,'group_id');
+    }
 }

@@ -10,6 +10,7 @@ use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\InviteUserRequest;
 use App\Models\GroupUser;
+use App\Notifications\InvitationApproved;
 use App\Notifications\InvitationInGroup;
 use Carbon\Carbon;
 use Inertia\Inertia;
@@ -136,7 +137,29 @@ class GroupController extends Controller
 
     public function approveInvitation(string $token)
     {
-        
+        $groupUser = GroupUser::where('token', $token)->first();
+        $errorTitle = "";
+        if(!$groupUser) {
+            $errorTitle = 'The link is not valid';
+        }elseif($groupUser->token_used || $groupUser->status == GroupUserStatus::APPROVED->value) {
+            $errorTitle = 'The link is already used';
+        } else if ($groupUser->token_expire_date < Carbon::now()) {
+            $errorTitle = 'The link is expired';
+        }
+
+        if($errorTitle){
+            return \inertia('Error', compact('errorTitle'));
+        }
+
+        $groupUser->status = GroupUserStatus::APPROVED->value;
+        $groupUser->token_used = Carbon::now();
+        $groupUser->save();
+
+        $adminUser = $groupUser->adminUser;
+        $adminUser->notify(new InvitationApproved($groupUser->group, $groupUser->user));
+
+        return redirect(route('group.profile', $groupUser->group))
+            ->with('success', 'You accepted to join to group "' . $groupUser->group->name . '"');
     }
 
     public function update(UpdateGroupRequest $request, Group $group)
