@@ -24,21 +24,21 @@ defineEmits(['approve', 'reject', 'roleChange', 'delete'])
 <template>
     <div class="bg-white dark:bg-slate-900 dark:text-gray-100 transition-all border-2 border-transparent hover:border-indigo-500">
         <div class="flex items-center gap-2 py-2 px-2">
-            <Link href="#">
-                <img src="https://randomuser.me/api/portraits/women/70.jpg" class="w-[32px] rounded-full"/>
+            <Link :href="route('profile', user.username)">
+                <img :src="user.avatar_url || '/images/user_default.png'" class="w-[32px] rounded-full"/>
             </Link>
             <div class="flex justify-between flex-1">
-                <Link href="#">
+                <Link :href="route('profile', user.username)">
                     <h3 class="font-black hover:underline">{{ user.name }}</h3>
                 </Link>
                 <div v-if="forApprove" class="flex gap-1">
                     <button class="text-xs py-1 px-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white"
-                        @click="$emit('approve', user)"
+                        @click.prevent.stop="$emit('approve', user)"
                     >
                         approve
                     </button>
                     <button class="text-xs py-1 px-2 rounded bg-red-500 hover:bg-red-600 text-white"
-                        @click="$emit('reject', user)"
+                        @click.prevent.stop="$emit('reject', user)"
                     >
                         reject
                     </button>
@@ -52,7 +52,7 @@ defineEmits(['approve', 'reject', 'roleChange', 'delete'])
                         <option :selected="user.role === 'user'">user</option>
                     </select>
                     <button
-                            @click="$emit('delete', user)"
+                            @click.prevent.stop="$emit('delete', user)"
                             class="text-xs py-1.5 px-2 rounded bg-gray-700 hover:bg-gray-800 text-white ml-3 disabled:bg-gray-500"
                             :disabled="disableRoleDropdown">delete
                     </button>

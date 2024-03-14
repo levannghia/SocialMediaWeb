@@ -21,7 +21,7 @@ class UserResource extends JsonResource
             "name" => $this->name,
             "email" => $this->email,
             "username" => $this->username,
-            "cover_url" => Storage::url($this->cover_path),
+            "cover_url" => $this->cover_path != null ? Storage::url($this->cover_path) : '/images/defaut_cover_photo.jpg',
             "avatar_url" => $this->avatar_path != null ? Storage::url($this->avatar_path) : '/images/user_default.png',
             "email_verified_at" => $this->email_verified_at,
             "created_at" => $this->created_at,

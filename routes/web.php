@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+
 // use Inertia\Inertia;
 // use Goutte\Client;
 
@@ -100,7 +101,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/group', [GroupController::class, 'store'])->name('group.store');
     Route::post('/group/update-image/{group:slug}', [GroupController::class, 'updateImage'])->name('group.updateImage');
     Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
-    Route::post('/join/{group:slug}', [GroupController::class,'join'])->name('group.join');
+    Route::post('/join/{group:slug}', [GroupController::class, 'join'])->name('group.join');
+    Route::post('/approve-request/{group:slug}', [GroupController::class, 'approveRequest'])->name('group.approveRequest');
+    Route::delete('/remove-user/{group:slug}', [GroupController::class, 'removeUser'])->name('group.removeUser');
 });
 
 require __DIR__ . '/auth.php';
