@@ -77,27 +77,31 @@
               <TabItem text="Posts" :selected="selected" />
             </Tab>
             <Tab v-slot="{ selected }" as="template">
-              <TabItem text="Followers" :selected="selected" />
+              <TabItem text="Users" :selected="selected" />
             </Tab>
-            <Tab v-slot="{ selected }" as="template">
-              <TabItem text="Followings" :selected="selected" />
+            <Tab v-if="isCurrentUserAdmin" v-slot="{ selected }" as="template">
+              <TabItem text="Pending Requests" :selected="selected" />
             </Tab>
             <Tab v-slot="{ selected }" as="template">
               <TabItem text="Photos" :selected="selected" />
             </Tab>
-            <Tab v-if="isCurrentUserAdmin" v-slot="{ selected }" as="template">
-              <TabItem text="My Profile" :selected="selected" />
+            <Tab v-slot="{ selected }" as="template">
+              <TabItem text="About" :selected="selected" />
             </Tab>
+            <!-- <Tab v-if="isCurrentUserAdmin" v-slot="{ selected }" as="template">
+              <TabItem text="My Profile" :selected="selected" />
+            </Tab> -->
           </TabList>
 
           <TabPanels class="mt-2">
             <TabPanel class="bg-white p-3 shadow"> Posts </TabPanel>
-            <TabPanel class="bg-white p-3 shadow"> Followers </TabPanel>
-            <TabPanel class="bg-white p-3 shadow"> Followings </TabPanel>
+            <TabPanel class="bg-white p-3 shadow"> Users </TabPanel>
+            <TabPanel v-if="isCurrentUserAdmin" class="bg-white p-3 shadow"> Pending Request </TabPanel>
             <TabPanel class="bg-white p-3 shadow"> Photos </TabPanel>
-            <TabPanel class="bg-white p-3 shadow">
+            <TabPanel class="bg-white p-3 shadow"> About </TabPanel>
+            <!-- <TabPanel class="bg-white p-3 shadow">
               <Edit :mustVerifyEmail="mustVerifyEmail" :status="status" />
-            </TabPanel>
+            </TabPanel> -->
           </TabPanels>
         </TabGroup>
       </div>
@@ -112,7 +116,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import { usePage, Head, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
-import Edit from "@/Pages/Profile/Edit.vue";
+// import Edit from "@/Pages/Profile/Edit.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import { XMarkIcon, CheckIcon, CameraIcon, CheckCircleIcon } from "@heroicons/vue/24/solid";
 import InviteUserModal from "@/Components/app/InviteUserModal.vue";
