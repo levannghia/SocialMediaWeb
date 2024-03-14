@@ -12,10 +12,12 @@ use App\Http\Requests\InviteUserRequest;
 use App\Models\GroupUser;
 use App\Notifications\InvitationApproved;
 use App\Notifications\InvitationInGroup;
+use App\Notifications\RequestToJoinGroup;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class GroupController extends Controller
@@ -162,6 +164,28 @@ class GroupController extends Controller
 
         return redirect(route('group.profile', $groupUser->group))
             ->with('success', 'You accepted to join to group "' . $groupUser->group->name . '"');
+    }
+
+    public function join(Request $request, Group $group){
+        $user = $request->user();
+        $status = GroupUserStatus::APPROVED->value;
+        $successMessage = 'You have joined to group "' . $group->name . '"';
+
+        if(!$group->auto_approval){
+            $status = GroupUserStatus::PENDING->value;
+            Notification::send($group->adminUser, new RequestToJoinGroup($group, $user));
+            $successMessage = 'Your request has been accepted. You will be notified once you will be approved';
+        }
+
+        GroupUser::create([
+            'status' => $status,
+            'role' => GroupUserRole::USER->value,
+            'user_id' => $user->id,
+            'group_id' => $group->id,
+            'created_by' => $user->id,
+        ]);
+
+        return redirect()->back()->with('success', $successMessage);
     }
 
     public function update(UpdateGroupRequest $request, Group $group)

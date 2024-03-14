@@ -66,7 +66,7 @@
                             </PrimaryButton>
             <PrimaryButton v-if="authUser && isCurrentUserAdmin" @click="showInviteUserModal = true">Invite Users</PrimaryButton>
             <PrimaryButton v-if="authUser && !group.role && group.auto_approval" @click="joinToGroup">Join To Group</PrimaryButton>
-            <PrimaryButton v-if="authUser && !group.role && !group.auto_approval">Request To Join</PrimaryButton>
+            <PrimaryButton v-if="authUser && !group.role && !group.auto_approval" @click="joinToGroup">Request To Join</PrimaryButton>
           </div>
         </div>
       </div>
@@ -207,6 +207,15 @@ function submitThumbnailImage() {
 }
 
 function joinToGroup(){
-
+  const form = useForm({});
+  form.post(route('group.join', props.group.slug), {
+    onSuccess(res) {
+      console.log(res);
+    },
+    onError(res) {
+      console.log(res);
+    },
+    preserveScroll: true
+  })
 }
 </script>

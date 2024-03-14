@@ -42,4 +42,8 @@ class Group extends Model
         ->where('role', GroupUserRole::ADMIN->value)
         ->exists();
     }
+
+    public function adminUser() {
+        return $this->belongsToMany(User::class, 'group_users')->wherePivot('role', GroupUserRole::ADMIN->value);
+    }
 }
