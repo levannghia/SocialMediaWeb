@@ -1,6 +1,5 @@
 <script setup>
 import { isImage } from "@/helpers";
-import UrlPreview from "@/Components/app/UrlPreview.vue";
 import { ArrowDownTrayIcon } from '@heroicons/vue/24/outline'
 import {
   PaperClipIcon

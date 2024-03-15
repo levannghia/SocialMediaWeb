@@ -220,6 +220,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
 // import Edit from "@/Pages/Profile/Edit.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
 import {
   XMarkIcon,
   CheckIcon,
@@ -267,17 +268,18 @@ const showInviteUserModal = ref(false);
 const showNotification = ref(true);
 const coverImageSrc = ref("");
 const thumbnailImageSrc = ref("");
+// const isCurrentUserAdmin = ref(false);
 
-const isCurrentUserAdmin = computed({
-  get(){
-    return props.group.role;
-  },
-  set(value) {
-    if (value === "admin") {
-      this.value = true;
-    }
-  },
-});
+// watch(() => props.group.role, (newVal, oldVal) => {
+//   // Thực hiện hành động dựa trên thay đổi của role
+//   if (newVal === 'admin') {
+//     isCurrentUserAdmin.value = true;
+//   } else {
+//     isCurrentUserAdmin.value = false;
+//   }
+// }, { immediate: true }); // Tùy chọn: Chạy hiệu ứng ngay lập tức
+
+const isCurrentUserAdmin = computed(() => props.group.role === 'admin');
 const isJoinedGroup = computed(() => {
     return props.group.role && props.group.status === "approved";
   }
@@ -378,7 +380,14 @@ function deleteUser(user) {
 
 }
 
-function onRoleChange(user, value) {
-
+function onRoleChange(user, role) {
+    console.log(user, role)
+    const form = useForm({
+        user_id: user.id,
+        role
+    })
+    form.post(route('group.changeRole', props.group.slug), {
+        preserveScroll: true
+    })
 }
 </script>

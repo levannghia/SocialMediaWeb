@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/group/invite/{group:slug}', [GroupController::class, 'inviteUsers'])->name('group.inviteUsers');
     Route::post('/join/{group:slug}', [GroupController::class, 'join'])->name('group.join');
     Route::post('/approve-request/{group:slug}', [GroupController::class, 'approveRequest'])->name('group.approveRequest');
+    Route::post('/change-role/{group:slug}', [GroupController::class, 'changeRole'])->name('group.changeRole');
     Route::delete('/remove-user/{group:slug}', [GroupController::class, 'removeUser'])->name('group.removeUser');
 });
 

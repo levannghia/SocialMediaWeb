@@ -4,6 +4,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 
 defineProps({
     user: Object,
+    
     forApprove: {
         type: Boolean,
         default: false
@@ -25,7 +26,7 @@ defineEmits(['approve', 'reject', 'roleChange', 'delete'])
     <div class="bg-white dark:bg-slate-900 dark:text-gray-100 transition-all border-2 border-transparent hover:border-indigo-500">
         <div class="flex items-center gap-2 py-2 px-2">
             <Link :href="route('profile', user.username)">
-                <img :src="user.avatar_url || '/images/user_default.png'" class="w-[32px] rounded-full"/>
+                <img :src="user.avatar_url || '/images/user_default.png'" class="w-[32px] h-[32px] rounded-full"/>
             </Link>
             <div class="flex justify-between flex-1">
                 <Link :href="route('profile', user.username)">
@@ -45,7 +46,7 @@ defineEmits(['approve', 'reject', 'roleChange', 'delete'])
                 </div>
                 <div v-if="showRoleDropdown">
                     <select
-                            @change="$emit('roleChange', user, $event.tagret.value)"
+                            @change="$emit('roleChange', user, $event.target.value)"
                             class="rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 max-w-xs text-sm leading-6"
                             :disabled="disableRoleDropdown">
                         <option :selected="user.role === 'admin'">admin</option>

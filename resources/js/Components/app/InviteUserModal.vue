@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { XMarkIcon, BookmarkIcon } from '@heroicons/vue/24/solid'
 import { useForm, usePage } from "@inertiajs/vue3";
-import axiosClient from "@/axiosClient.js";
 import BaseModal from "@/Components/app/BaseModal.vue";
 import TextInput from '../TextInput.vue';
 

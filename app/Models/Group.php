@@ -36,6 +36,10 @@ class Group extends Model
         return $this->hasOne(GroupUser::class)->where('user_id', auth()->id());
     }
 
+    public function isOwner($user_id){
+        return $this->user_id == $user_id;
+    }
+
     public function isAdmin(){
         return GroupUser::query()
         ->where('user_id', auth()->id())
