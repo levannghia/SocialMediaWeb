@@ -130,12 +130,16 @@ const props = defineProps({
     required: true,
   },
   modelValue: Boolean,
+  group: {
+    type: Object,
+  }
 });
 
 
 const form = useForm({
   id: null,
   body: '',
+  group_id: null,
   attachments: [],
   deleted_file_ids: [],
   _method: 'POST'
@@ -196,6 +200,10 @@ watch(() => props.post, () => {
 })
 
 function submit() {
+  if(props.group){
+    form.group_id = props.group.id;
+  }
+
   form.attachments = attachmentFiles.value.map(myFile => {
     return myFile.file;
   })

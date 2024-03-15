@@ -59,4 +59,8 @@ class Group extends Model
     public function approvedUsers() {
         return $this->belongsToMany(User::class, 'group_users')->wherePivot('status', GroupUserStatus::APPROVED->value);
     }
+
+    public function group(){
+        return $this->belongsTo(Group::class);
+    }
 }

@@ -93,13 +93,13 @@
             <Tab v-slot="{ selected }" as="template">
               <TabItem text="About" :selected="selected" />
             </Tab>
-            <!-- <Tab v-if="isCurrentUserAdmin" v-slot="{ selected }" as="template">
-              <TabItem text="My Profile" :selected="selected" />
-            </Tab> -->
           </TabList>
 
           <TabPanels class="mt-2">
-            <TabPanel class="bg-white p-3 shadow"> Posts </TabPanel>
+            <TabPanel class="bg-white p-3 shadow">
+              <CreatePost :group="group"/>
+              <PostList :posts="posts.data"/>
+            </TabPanel>
             <TabPanel v-if="isJoinedGroup" class="bg-white p-3 shadow">
               <div class="mb-3">
                 <TextInput :model-value="searchKeyword" placeholder="Type to search" class="w-full" />
@@ -129,9 +129,6 @@
               </template>
               <div v-else class="ck-content-output dark:text-gray-100" v-html="group.about"></div>
             </TabPanel>
-            <!-- <TabPanel class="bg-white p-3 shadow">
-              <Edit :mustVerifyEmail="mustVerifyEmail" :status="status" />
-            </TabPanel> -->
           </TabPanels>
         </TabGroup>
       </div>
@@ -146,7 +143,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue";
 import { usePage, Head, useForm } from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
-// import Edit from "@/Pages/Profile/Edit.vue";
+import PostList from "@/Components/app/PostList.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
 import {
@@ -155,6 +152,7 @@ import {
   CameraIcon,
   CheckCircleIcon,
 } from "@heroicons/vue/24/solid";
+import CreatePost from "@/Components/app/CreatePost.vue";
 import InviteUserModal from "@/Components/app/InviteUserModal.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
 import GroupForm from "@/Components/app/GroupForm.vue";
@@ -168,6 +166,10 @@ const props = defineProps({
 
   status: {
     type: String,
+  },
+
+  posts: {
+    type: Object,
   },
 
   group: {

@@ -15,25 +15,8 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $user_id = auth()->id();
-        $query = Post::query()
-            ->withCount(['reactions', 'comments'])
-            ->with([
-                'attachments',
-                'user',
-                'reactions' => function ($query) use ($user_id) {
-                    $query->where('user_id', $user_id);
-                },
-                'comments' => function ($query) use ($user_id) {
-                    $query
-                        // ->whereNull('parent_id')
-                        ->withCount(['reactions', 'comments'])->with([
-                                'user',
-                                'reactions' => function ($query) use ($user_id) {
-                                    $query->where('user_id', $user_id);
-                                },
-                            ]);
-                },
-            ])->latest()->paginate(10);
+        $query = Post::postsForTimeLine($user_id)
+            ->paginate(10);
 
         $posts = PostResource::collection($query);
 

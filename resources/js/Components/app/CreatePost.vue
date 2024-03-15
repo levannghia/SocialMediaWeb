@@ -33,7 +33,7 @@ function showCreatePostModal() {
             Click here to create new post
         </div>
 
-        <PostModal :post="newPost" v-model="showModal"/>
+        <PostModal :post="newPost" v-model="showModal" :group="group"/>
     </div>
 </template>
 

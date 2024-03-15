@@ -60,7 +60,7 @@ class PostController extends Controller
             Log::debug("Lỗi function store post: " . $e->getMessage() . ' --line:' . $e->getLine());
         }
 
-        return redirect()->back();
+        return back();
     }
 
     /**

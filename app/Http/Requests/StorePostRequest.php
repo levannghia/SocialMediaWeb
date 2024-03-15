@@ -32,6 +32,7 @@ class StorePostRequest extends FormRequest
         return [
             'body' => ['nullable', 'string'],
             'user_id' => ['numeric'],
+            'group_id' => ['nullable', 'exists:groups,id'],
             'attachments' => [
                 'array',
                 'max:50',

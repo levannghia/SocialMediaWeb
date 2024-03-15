@@ -10,6 +10,7 @@ use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Resources\GroupUserResource;
+use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\GroupUser;
 use App\Models\User;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Notifications\RoleChanged;
+use App\Models\Post;
 
 class GroupController extends Controller
 {
@@ -34,19 +36,25 @@ class GroupController extends Controller
     public function profile(Group $group)
     {
         $group->load('currentUserGroup');
+        $user_id = auth()->id();
+
+        $posts = Post::postsForTimeLine($user_id)
+            ->where('group_id', $group->id)
+            ->paginate(10);
         // $users = $group->approvedUsers;
         $requests = $group->pendingUsers;
         $users = User::query()
-        ->select(['users.*', 'gu.status', 'gu.role', 'gu.group_id'])
-        ->join('group_users as gu', 'gu.user_id', 'users.id')
-        ->where('gu.status', 'approved')
-        ->where('gu.group_id', $group->id)
-        ->orderBy('users.name')
-        ->get();
+            ->select(['users.*', 'gu.status', 'gu.role', 'gu.group_id'])
+            ->join('group_users as gu', 'gu.user_id', 'users.id')
+            ->where('gu.status', 'approved')
+            ->where('gu.group_id', $group->id)
+            ->orderBy('users.name')
+            ->get();
 
         return Inertia::render('Group/View', [
             'success' => session('success'),
             'group' => new GroupResource($group),
+            'posts' => PostResource::collection($posts),
             'users' => GroupUserResource::collection($users),
             'requests' => UserResource::collection($requests),
         ]);
@@ -91,7 +99,7 @@ class GroupController extends Controller
 
     public function updateImage(Request $request, Group $group)
     {
-        if(!$group->isAdmin()){
+        if (!$group->isAdmin()) {
             return response('You don\'t have permission to perform this action', 403);
         }
 
@@ -159,15 +167,15 @@ class GroupController extends Controller
     {
         $groupUser = GroupUser::where('token', $token)->first();
         $errorTitle = "";
-        if(!$groupUser) {
+        if (!$groupUser) {
             $errorTitle = 'The link is not valid';
-        }elseif($groupUser->token_used || $groupUser->status == GroupUserStatus::APPROVED->value) {
+        } elseif ($groupUser->token_used || $groupUser->status == GroupUserStatus::APPROVED->value) {
             $errorTitle = 'The link is already used';
         } else if ($groupUser->token_expire_date < Carbon::now()) {
             $errorTitle = 'The link is expired';
         }
 
-        if($errorTitle){
+        if ($errorTitle) {
             return \inertia('Error', [
                 'title' => $errorTitle,
             ]);
@@ -184,12 +192,13 @@ class GroupController extends Controller
             ->with('success', 'You accepted to join to group "' . $groupUser->group->name . '"');
     }
 
-    public function join(Request $request, Group $group){
+    public function join(Request $request, Group $group)
+    {
         $user = $request->user();
         $status = GroupUserStatus::APPROVED->value;
         $successMessage = 'You have joined to group "' . $group->name . '"';
 
-        if(!$group->auto_approval){
+        if (!$group->auto_approval) {
             $status = GroupUserStatus::PENDING->value;
             Notification::send($group->adminUser, new RequestToJoinGroup($group, $user));
             $successMessage = 'Your request has been accepted. You will be notified once you will be approved';
@@ -206,7 +215,8 @@ class GroupController extends Controller
         return redirect()->back()->with('success', $successMessage);
     }
 
-    public function approveRequest(Request $request, Group $group) {
+    public function approveRequest(Request $request, Group $group)
+    {
         if (!$group->isAdmin()) {
             return response("You don't have permission to perform this action", 403);
         }
@@ -217,31 +227,32 @@ class GroupController extends Controller
         ]);
 
         $groupUser = GroupUser::where('user_id', $data['user_id'])
-        ->where('group_id', $group->id)
-        ->where('status', GroupUserStatus::PENDING->value)
-        ->first();
+            ->where('group_id', $group->id)
+            ->where('status', GroupUserStatus::PENDING->value)
+            ->first();
 
-        if($groupUser){
+        if ($groupUser) {
             $approved = false;
-            if($data['action'] === 'approve'){
+            if ($data['action'] === 'approve') {
                 $approved = true;
                 $groupUser->status = GroupUserStatus::APPROVED->value;
-            }else{
+            } else {
                 $groupUser->status = GroupUserStatus::REJECTED->value;
             }
 
             $groupUser->save();
             $user = $groupUser->user;
             $user->notify(new RequestApproved($groupUser->group, $user, $approved));
-            
-            return back()->with('success', 'User "' . $user->name . '" was ' . ( $approved ? 'approved' : 'rejected' )); 
+
+            return back()->with('success', 'User "' . $user->name . '" was ' . ($approved ? 'approved' : 'rejected'));
         }
 
         return back();
     }
 
-    public function changeRole(Request $request, Group $group) {
-        if(!$group->isAdmin()){
+    public function changeRole(Request $request, Group $group)
+    {
+        if (!$group->isAdmin()) {
             return response('You don\'t have permission to perform this action', 403);
         }
 
@@ -252,13 +263,13 @@ class GroupController extends Controller
 
         $user_id = $data['user_id'];
 
-        if($group->isOwner($user_id)){
+        if ($group->isOwner($user_id)) {
             return response("You can't change role of the owner of the group", 403);
         }
 
         $groupUser = GroupUser::where("user_id", $user_id)->where('group_id', $group->id)->first();
 
-        if($groupUser){
+        if ($groupUser) {
             $groupUser->role = $data['role'];
             $groupUser->save();
             $groupUser->user->notify(new RoleChanged($group, $data['role']));
@@ -268,8 +279,9 @@ class GroupController extends Controller
     }
 
 
-    public function removeUser(Request $request, Group $group) {
-        if(!$group->isAdmin()){
+    public function removeUser(Request $request, Group $group)
+    {
+        if (!$group->isAdmin()) {
             return response('You don\'t have permission to perform this action', 403);
         }
 
@@ -279,26 +291,26 @@ class GroupController extends Controller
 
         $user_id = $data['user_id'];
 
-        if($group->isOwner($user_id)){
+        if ($group->isOwner($user_id)) {
             return response("The owner of the group cannot be removed", 403);
         }
 
         $groupUser = GroupUser::where("user_id", $user_id)->where('group_id', $group->id)->first();
 
-        if($groupUser){
+        if ($groupUser) {
             $groupUser->delete();
         }
 
         return back();
     }
 
-    public function update(UpdateGroupRequest $request, Group $group) {
+    public function update(UpdateGroupRequest $request, Group $group)
+    {
         // if(!$group->isAdmin()){
         //     return response('You don\'t have permission to perform this action', 403);
         // }
 
         $group->update($request->validated());
-
         return back();
     }
 

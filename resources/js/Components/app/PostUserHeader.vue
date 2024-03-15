@@ -1,6 +1,6 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
-
+import { ChevronRightIcon } from '@heroicons/vue/24/outline'
 defineProps({
     post: {
         type: Object
@@ -23,12 +23,12 @@ defineProps({
       />
     </Link>
     <div>
-      <h4 class="font-bold">
+      <h4 class="flex items-center font-bold">
         <Link :href="route('profile', post.user.username)" class="hover:underline">{{
           post.user.name
         }}</Link>
         <template v-if="post.group">
-          >
+          <ChevronRightIcon class="w-3"/>
           <a href="javascript:void(0)" class="hover:underline">{{
             post.group.name
           }}</a>

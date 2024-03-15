@@ -35,7 +35,8 @@ class Post extends Model
     //     return $this->hasMany(Reaction::class);
     // }
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 
@@ -43,7 +44,33 @@ class Post extends Model
     {
         return $this->morphMany(Reaction::class, 'object');
     }
-    public function latest5Comments(){
+    public function latest5Comments()
+    {
         return $this->hasMany(Comment::class)->with('user');
+    }
+
+    public static function postsForTimeLine($user_id)
+    {
+        return Post::query()
+            ->withCount(['reactions', 'comments'])
+            ->with([
+                'group',
+                'attachments',
+                'user',
+                'reactions' => function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id);
+                },
+                'comments' => function ($query) use ($user_id) {
+                    $query
+                        // ->whereNull('parent_id')
+                        ->withCount(['reactions', 'comments'])->with([
+                                'user',
+                                'reactions' => function ($query) use ($user_id) {
+                                    $query->where('user_id', $user_id);
+                                },
+                            ]);
+                },
+            ])
+            ->latest();
     }
 }
