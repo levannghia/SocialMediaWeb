@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class UpdateGroupRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateGroupRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +23,16 @@ class UpdateGroupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "name" => ["required", "max:255"],
+            "auto_approval"=> ["required", "boolean"],
+            "about"=> ['nullable'],
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'about' => nl2br($this->about),
+        ]);
     }
 }

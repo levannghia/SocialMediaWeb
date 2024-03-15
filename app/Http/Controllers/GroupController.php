@@ -267,9 +267,39 @@ class GroupController extends Controller
         return back();
     }
 
-    public function update(UpdateGroupRequest $request, Group $group)
-    {
-        //
+
+    public function removeUser(Request $request, Group $group) {
+        if(!$group->isAdmin()){
+            return response('You don\'t have permission to perform this action', 403);
+        }
+
+        $data = $request->validate([
+            'user_id' => ['required'],
+        ]);
+
+        $user_id = $data['user_id'];
+
+        if($group->isOwner($user_id)){
+            return response("The owner of the group cannot be removed", 403);
+        }
+
+        $groupUser = GroupUser::where("user_id", $user_id)->where('group_id', $group->id)->first();
+
+        if($groupUser){
+            $groupUser->delete();
+        }
+
+        return back();
+    }
+
+    public function update(UpdateGroupRequest $request, Group $group) {
+        // if(!$group->isAdmin()){
+        //     return response('You don\'t have permission to perform this action', 403);
+        // }
+
+        $group->update($request->validated());
+
+        return back();
     }
 
     /**

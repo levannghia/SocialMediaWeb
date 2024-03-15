@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/approve-request/{group:slug}', [GroupController::class, 'approveRequest'])->name('group.approveRequest');
     Route::post('/change-role/{group:slug}', [GroupController::class, 'changeRole'])->name('group.changeRole');
     Route::delete('/remove-user/{group:slug}', [GroupController::class, 'removeUser'])->name('group.removeUser');
+    Route::put('/group/{group:slug}', [GroupController::class, 'update'])->name('group.update');
 });
 
 require __DIR__ . '/auth.php';
