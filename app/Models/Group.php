@@ -47,6 +47,10 @@ class Group extends Model
         ->where('role', GroupUserRole::ADMIN->value)
         ->exists();
     }
+    
+    public function hasApproveUser($user_id){
+        return GroupUser::query()->where('user_id', $user_id)->where('group_id', $this->id)->where('status', GroupUserStatus::APPROVED->value)->exists();
+    }
 
     public function adminUser() {
         return $this->belongsToMany(User::class, 'group_users')->wherePivot('role', GroupUserRole::ADMIN->value);

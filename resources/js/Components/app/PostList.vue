@@ -15,8 +15,8 @@ const props = defineProps({
 });
 
 const allPosts = ref({
-  data: page.props.posts.data,
-  next: page.props.posts.links?.next,
+  data: [],
+  next: [],
 });
 
 const authUser = usePage().props.auth.user;
@@ -27,17 +27,26 @@ const showAttachmentModal = ref(false);
 const previewAttachmentPost = ref({});
 const loadMoreIntersect = ref(null);
 
-watch(
-  () => page.props.posts.data,
-  () => {
-    console.log("update");
-    allPosts.value = {
-      data: page.props.posts.data,
-      next: page.props.posts.links?.next,
-    };
-  },
-  { deep: true }
-);
+// watch(
+//   () => page.props.posts.data,
+//   () => {
+//     console.log("update");
+//     allPosts.value = {
+//       data: page.props.posts.data,
+//       next: page.props.posts.links?.next,
+//     };
+//   },
+//   { deep: true }
+// );
+
+watch(() => page.props.posts, () => {
+    if (page.props.posts) {
+        allPosts.value = {
+            data: page.props.posts.data,
+            next: page.props.posts.links?.next
+        }
+    }
+}, {deep: true, immediate: true})
 
 function openEditModal(post) {
   editPost.value = post;
