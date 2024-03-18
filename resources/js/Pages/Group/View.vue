@@ -97,8 +97,13 @@
 
           <TabPanels class="mt-2">
             <TabPanel class="bg-white p-3 shadow">
-              <CreatePost :group="group"/>
-              <PostList :posts="posts.data"/>
+              <template v-if="posts">
+                <CreatePost :group="group" />
+                <PostList v-if="posts.data.length" :posts="posts.data" />
+                <div v-else class="py-8 text-center dark:text-gray-100">
+                  There are no posts in this group. Be the first and create it.
+                </div>
+              </template>
             </TabPanel>
             <TabPanel v-if="isJoinedGroup" class="bg-white p-3 shadow">
               <div class="mb-3">
@@ -337,8 +342,8 @@ function onRoleChange(user, role) {
   })
 }
 
-function updateGroup(){
-  groupForm.put(route('group.update', props.group.slug),{
+function updateGroup() {
+  groupForm.put(route('group.update', props.group.slug), {
     preserveScroll: true,
   })
 }

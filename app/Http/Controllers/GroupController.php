@@ -33,15 +33,31 @@ class GroupController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function profile(Group $group)
+    public function profile(Request $request, Group $group)
     {
         $group->load('currentUserGroup');
         $user_id = auth()->id();
 
-        $posts = Post::postsForTimeLine($user_id)
+        if($group->hasApproveUser($user_id)) {
+            $queryPosts = Post::postsForTimeLine($user_id)
             ->where('group_id', $group->id)
             ->paginate(10);
-        // $users = $group->approvedUsers;
+
+            $posts = PostResource::collection($queryPosts);
+        }else{
+            return Inertia::render('Group/View', [
+                'success' => session('success'),
+                'group' => new GroupResource($group),
+                'posts' => null,
+                'users' => [],
+                'requests' => [],
+            ]);
+        }
+
+        if($request->wantsJson()){
+            return $posts;
+        }
+        
         $requests = $group->pendingUsers;
         $users = User::query()
             ->select(['users.*', 'gu.status', 'gu.role', 'gu.group_id'])
@@ -54,7 +70,7 @@ class GroupController extends Controller
         return Inertia::render('Group/View', [
             'success' => session('success'),
             'group' => new GroupResource($group),
-            'posts' => PostResource::collection($posts),
+            'posts' => $posts,
             'users' => GroupUserResource::collection($users),
             'requests' => UserResource::collection($requests),
         ]);
