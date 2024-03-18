@@ -18,9 +18,9 @@ class GroupUserResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
-            'role' => $this->role,
-            'status' => $this->status,
-            'group_id' => $this->group_id,
+            "role" => $this->role,
+            "status" => $this->status,
+            "group_id" => $this->group_id,
             "username" => $this->username,
             "avatar_url" => $this->avatar_path ? Storage::url($this->avatar_path) : '/images/user_default.png',
         ];

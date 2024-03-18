@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/update-image', [ProfileController::class, 'updateImage'])->name('profile.updateImage');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
     //Posts
 
     Route::post('/post', [PostController::class, 'store'])->name('post.store');

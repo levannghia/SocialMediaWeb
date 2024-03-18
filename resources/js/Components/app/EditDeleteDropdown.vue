@@ -7,7 +7,10 @@ import {
 } from "@heroicons/vue/20/solid";
 import { usePage } from "@inertiajs/vue3";
 
-const authUser = usePage().props.auth.user
+const authUser = usePage().props.auth.user;
+const group = usePage().props?.group;
+
+console.log(group);
 const emit = defineEmits(['edit', 'delete']);
 
 const props = defineProps({

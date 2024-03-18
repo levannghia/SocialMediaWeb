@@ -24,14 +24,12 @@ defineProps({
     </Link>
     <div>
       <h4 class="flex items-center font-bold">
-        <Link :href="route('profile', post.user.username)" class="hover:underline">{{
-          post.user.name
-        }}</Link>
+        <Link :href="route('profile', post.user.username)" class="hover:underline">{{ post.user.name }}</Link>
         <template v-if="post.group">
           <ChevronRightIcon class="w-3"/>
-          <a href="javascript:void(0)" class="hover:underline">{{
-            post.group.name
-          }}</a>
+          <Link :href="route('group.profile', post.group.slug)" class="hover:underline">
+            {{ post.group.name }}
+          </Link>
         </template>
       </h4>
       <small v-if="showTime" class="text-gray-400">{{ post.updated_at }}</small>
