@@ -43,4 +43,20 @@ class Comment extends Model
     {
         return $this->hasMany(self::class, 'parent_id');
     }
+
+    public static function getAllChildrenComments($comment) {
+        $comments = Comment::query()->where('post_id', $comment->id)->get();
+        $result = [$comment];
+        self::getAllChildrenComments($comments, $comment->id, $result);
+        return $result;
+    }
+
+    private static function _getAllChildComments($comments, $parentId, &$result = []) {
+        foreach ($comments as $comment) {
+            if($comment->parent_id === $parentId){
+                $result[] = $comment;
+                self::_getAllChildComments($comments, $comment->id, $result);
+            }
+        }
+    }
 }
