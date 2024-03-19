@@ -150,11 +150,8 @@ function onCommentDelete(comment) {
                 <Disclosure>
                     <div class="mt-1 flex gap-2">
                         <button @click="sendCommentReaction(comment)"
-                            class="flex items-center text-xs text-indigo-500 py-0.5 px-1  rounded-lg" :class="[
-                                comment.current_user_has_reaction ?
-                                    'bg-indigo-50 hover:bg-indigo-100' :
-                                    'hover:bg-indigo-50'
-                            ]">
+                            class="flex items-center text-xs text-indigo-500 py-0.5 px-1 rounded-lg" 
+                            :class="[comment.current_user_has_reaction ? 'bg-indigo-50 hover:bg-indigo-100' : 'hover:bg-indigo-50']">
                             <HandThumbUpIcon class="w-3 h-3 mr-2" />
                             {{ comment.num_of_reaction }}
                             {{ comment.current_user_has_reaction ? 'Unlike' : 'Like' }}
