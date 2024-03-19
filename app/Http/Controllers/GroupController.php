@@ -322,12 +322,8 @@ class GroupController extends Controller
 
     public function update(UpdateGroupRequest $request, Group $group)
     {
-        // if(!$group->isAdmin()){
-        //     return response('You don\'t have permission to perform this action', 403);
-        // }
-
         $group->update($request->validated());
-        return back();
+        return back()->with('success', "Group was updated");
     }
 
     /**

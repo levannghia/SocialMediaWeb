@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Models\PostAttachment;
 use App\Models\Reaction;
 use App\Http\Requests\UpdateCommentRequest;
+use App\Http\Resources\PostResource;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use App\Notifications\PostDeleted;
+use Illuminate\Support\Facades\Notification;
+use Inertia\Inertia;
 
 class PostController extends Controller
 {
@@ -53,6 +56,13 @@ class PostController extends Controller
             }
 
             DB::commit();
+
+            $group = $post->group;
+
+            if($group){
+                $users = $group->approvedUsers()->where('users.id', $user->id)->get();
+                Notification::send($users, new PostDeleted($post, $user, $group));
+            }
         } catch (\Exception $e) {
             foreach ($allFilesPath as $path) {
                 Storage::disk('public')->delete($path);
@@ -69,7 +79,18 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        // $post = $post->with(['attachments', 'comments']);
+        $post->loadCount('reactions');
+        $post->load([
+            'attachments',
+            'comments' => function ($query) {
+                $query->withCount('reactions'); // SELECT * FROM comments WHERE post_id IN (1, 2, 3...)
+                // SELECT COUNT(*) from reactions
+            },
+        ]);
+        return Inertia::render("Post/View", [
+            'post' => new PostResource($post),
+        ]);
     }
 
     /**

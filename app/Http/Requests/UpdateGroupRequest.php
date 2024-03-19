@@ -26,11 +26,11 @@ class UpdateGroupRequest extends FormRequest
         return [
             "name" => ["required", "max:255"],
             "auto_approval"=> ["required", "boolean"],
-            "about"=> ['nullable'],
+            "about" => ['nullable'],
         ];
     }
 
-    protected function prepareForValidation()
+    protected function prepareForValidation(): void
     {
         $this->merge([
             'about' => nl2br($this->about),

@@ -22,6 +22,7 @@ class Group extends Model
         'auto_approval',
         'user_id',
         'deleted_by',
+        'about'
     ];
 
     public function getSlugOptions(): SlugOptions
