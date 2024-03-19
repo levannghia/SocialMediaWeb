@@ -132,7 +132,7 @@ function onCommentDelete(comment) {
                         <small class="text-gray-400 text-xs">{{ comment.updated_at }}</small>
                     </div>
                 </div>
-                <EditDeleteDropdown :user="comment.user" @edit="startCommentEdit(comment)"
+                <EditDeleteDropdown :comment="comment" :post="post" @edit="startCommentEdit(comment)"
                     @delete="deleteComment(comment)" />
             </div>
 

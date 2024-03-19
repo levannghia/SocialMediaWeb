@@ -49,6 +49,11 @@ class Post extends Model
         return $this->hasMany(Comment::class)->with('user');
     }
 
+    public function isOwner($userId)
+    {
+        return $this->user_id == $userId;
+    }
+
     public static function postsForTimeLine($user_id)
     {
         return Post::query()
@@ -72,5 +77,14 @@ class Post extends Model
                 },
             ])
             ->latest();
+    }
+
+    protected static function boot(){
+        parent::boot();
+
+        static::deleting(function ($post) {
+            $post->deleted_by = auth()->id();
+            $post->save();
+        });
     }
 }

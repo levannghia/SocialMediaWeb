@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Notifications\PostDeleted;
 
 class PostController extends Controller
 {
@@ -230,14 +231,14 @@ class PostController extends Controller
     public function deleteComment(Comment $comment)
     {
         $post = $comment->post;
+        $user_id = auth()->id();
 
-        if ($comment->user_id != $post->user_id) {
-            return response('Bạn không có quyền xóa bình luận', 403);
+        if ($comment->isOwner($user_id) || $post->isOwed($user_id)) {
+            $comment->delete();
+            return response('', 204);
         }
 
-        $comment->delete();
-
-        return response('', 204);
+        return response('Bạn không có quyền xóa bình luận', 403);
     }
 
     /**
@@ -247,11 +248,14 @@ class PostController extends Controller
     {
         $id = auth()->id();
 
-        if ($post->user_id != $id) {
-            return response("Bạn không có quyền xóa bài viết này!", 403);
+        if ($post->isOwner($id) || $post->group && $post->group->isAdmin()) {
+            $post->delete();
+            if (!$post->isOwner($id)) {
+                $post->user->notify(new PostDeleted($post->group));
+            }
+            return back();
         }
-
-        $post->delete();
-        return back();
+        
+        return response("Bạn không có quyền xóa bài viết này!", 403);
     }
 }

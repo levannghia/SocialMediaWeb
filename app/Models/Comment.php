@@ -19,6 +19,11 @@ class Comment extends Model
         'parent_id'
     ];
 
+    public function isOwner($userId)
+    {
+        return $this->user_id == $userId;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
