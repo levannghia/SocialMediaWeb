@@ -4,6 +4,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // use Inertia\Inertia;
@@ -85,6 +86,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
+    Route::post('/user/follower/{user}', [UserController::class,'followUser'])->name('user.follow');
+
     //Posts
 
     Route::get('/post/{post}', [PostController::class, 'show'])->name('post.view');

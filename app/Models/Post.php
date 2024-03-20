@@ -59,7 +59,9 @@ class Post extends Model
         return Post::query()
             ->withCount(['reactions', 'comments'])
             ->with([
-                'group',
+                'group' => function ($query) {
+                    $query->with('currentUserGroup');
+                },
                 'attachments',
                 'user',
                 'reactions' => function ($query) use ($user_id) {

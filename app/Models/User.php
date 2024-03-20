@@ -56,8 +56,8 @@ class User extends Authenticatable implements MustVerifyEmail
             ->doNotGenerateSlugsOnUpdate();
     }
 
-    public function getRouteKeyName(): string
-    {
-        return 'username';
-    }
+    // public function getRouteKeyName(): string
+    // {
+    //     return 'username';
+    // }
 }

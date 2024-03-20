@@ -16,7 +16,23 @@ class HomeController extends Controller
     {
         $user_id = auth()->id();
         $query = Post::postsForTimeLine($user_id)
-            ->paginate(10);
+                ->select('posts.*')
+                ->leftJoin("followers AS f", function($join) use ($user_id) {
+                    $join->on("posts.user_id", "=", "f.user_id")
+                    ->where("f.follower_id", $user_id);
+                })
+                ->leftJoin("group_users AS gu", function($join) use ($user_id) {
+                    $join->on("gu.group_id", "=", "posts.group_id")
+                    ->where("gu.user_id", $user_id)
+                    ->where("gu.status", GroupUserStatus::APPROVED->value);
+                })
+                ->where(function($query) use ($user_id) {
+                    /** @var \Illuminate\Database\Query\Builder $query */
+                    $query->whereNotNull('f.follower_id')
+                        ->orWhereNotNull('gu.group_id')
+                        ->orWhere('posts.user_id', $user_id);
+                })
+                ->paginate(10);
 
         $posts = PostResource::collection($query);
 

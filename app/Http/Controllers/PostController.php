@@ -61,7 +61,9 @@ class PostController extends Controller
 
             if($group){
                 $users = $group->approvedUsers()->where('users.id', $user->id)->get();
-                Notification::send($users, new PostDeleted($post, $user, $group));
+                if($users){
+                    Notification::send($users, new PostDeleted($post, $user, $group));
+                }
             }
         } catch (\Exception $e) {
             foreach ($allFilesPath as $path) {
