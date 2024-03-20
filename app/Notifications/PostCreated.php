@@ -17,7 +17,7 @@ class PostCreated extends Notification
     /**
      * Create a new notification instance.
      */
-    public function __construct(public Post $post, public User $user, public Group $group)
+    public function __construct(public Post $post, public User $user, public ?Group $group = null)
     {
         //
     }

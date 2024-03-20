@@ -12,6 +12,7 @@ use App\Models\PostAttachment;
 use App\Models\Reaction;
 use App\Http\Requests\UpdateCommentRequest;
 use App\Http\Resources\PostResource;
+use App\Notifications\PostCreated;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,8 +62,8 @@ class PostController extends Controller
 
             if($group){
                 $users = $group->approvedUsers()->where('users.id', $user->id)->get();
-                if($users){
-                    Notification::send($users, new PostDeleted($post, $user, $group));
+                if(count($users) > 0){
+                    Notification::send($users, new PostCreated($post, $user, $group));
                 }
             }
         } catch (\Exception $e) {

@@ -22,7 +22,7 @@ class HomeController extends Controller
                     ->where("f.follower_id", $user_id);
                 })
                 ->leftJoin("group_users AS gu", function($join) use ($user_id) {
-                    $join->on("gu.group_id", "=", "posts.group_id")
+                    $join->on("posts.group_id", "=", "gu.group_id")
                     ->where("gu.user_id", $user_id)
                     ->where("gu.status", GroupUserStatus::APPROVED->value);
                 })

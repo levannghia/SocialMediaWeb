@@ -2,7 +2,7 @@
 import { Menu, MenuButton, MenuItems, MenuItem } from "@headlessui/vue";
 import {EllipsisVerticalIcon, PencilIcon, TrashIcon, EyeIcon} from "@heroicons/vue/20/solid/index.js";
 import {ClipboardIcon, MapPinIcon} from "@heroicons/vue/24/outline";
-import { usePage } from "@inertiajs/vue3";
+import { usePage, Link } from "@inertiajs/vue3";
 import { computed } from "vue";
 
 const props = defineProps({

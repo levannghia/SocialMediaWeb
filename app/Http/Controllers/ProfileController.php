@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 use App\Models\User;
+use App\Models\Post;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\PostResource;
 
 class ProfileController extends Controller
 {
@@ -21,18 +23,40 @@ class ProfileController extends Controller
      * Display the user's profile form.
      */
 
-    public function index(User $user){
+    public function index(Request $request, User $user)
+    {
         $isCurrentUserFollower = false;
-        if(!Auth::guest()){
+        if (!Auth::guest()) {
             $isCurrentUserFollower = Follower::where('user_id', $user->id)->where('follower_id', auth()->id())->exists();
         }
+
+        $posts = Post::postsForTimeline(Auth::id())
+            ->where('user_id', $user->id)
+            ->whereNull('group_id')
+            ->orderBy('posts.created_at', 'desc')
+            ->paginate(10);
+
+        $posts = PostResource::collection($posts);
+        if ($request->wantsJson()) {
+            return $posts;
+        }
+
+        $followers = $user->followers;
+        $followings = $user->followings;
+        $followerCount = Follower::where('user_id', $user->id)->count();
+
         return Inertia::render('Profile/View', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'isCurrentUserFollower' => $isCurrentUserFollower,
             'status' => session('status'),
+            'posts' => $posts,
+            'followerCount' => $followerCount,
+            'followers' => UserResource::collection($followers),
+            'followings' => UserResource::collection($followings),
             'success' => session('success'),
             'user' => new UserResource($user),
-        ]);;
+        ]);
+        ;
     }
 
     public function edit(Request $request): Response
@@ -80,7 +104,8 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function updateImage(Request $request) {
+    public function updateImage(Request $request)
+    {
         $data = $request->validate([
             'avatar' => ['nullable', 'image'],
             'cover' => ['nullable', 'image'],
@@ -110,7 +135,7 @@ class ProfileController extends Controller
             $success = 'Your avatar image was updated';
         }
 
-//        session('success', 'Cover image has been updated');
+        //        session('success', 'Cover image has been updated');
 
         return back()->with('success', $success);
     }
