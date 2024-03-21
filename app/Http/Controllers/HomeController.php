@@ -16,36 +16,47 @@ class HomeController extends Controller
     {
         $user_id = auth()->id();
         $query = Post::postsForTimeLine($user_id)
-                ->select('posts.*')
-                ->leftJoin("followers AS f", function($join) use ($user_id) {
-                    $join->on("posts.user_id", "=", "f.user_id")
+            ->select('posts.*')
+            ->leftJoin("followers AS f", function ($join) use ($user_id) {
+                $join->on("posts.user_id", "=", "f.user_id")
                     ->where("f.follower_id", $user_id);
-                })
-                ->leftJoin("group_users AS gu", function($join) use ($user_id) {
-                    $join->on("posts.group_id", "=", "gu.group_id")
+            })
+            ->leftJoin("group_users AS gu", function ($join) use ($user_id) {
+                $join->on("posts.group_id", "=", "gu.group_id")
                     ->where("gu.user_id", $user_id)
                     ->where("gu.status", GroupUserStatus::APPROVED->value);
-                })
-                ->where(function($query) use ($user_id) {
-                    /** @var \Illuminate\Database\Query\Builder $query */
-                    $query->whereNotNull('f.follower_id')
-                        ->orWhereNotNull('gu.group_id')
-                        ->orWhere('posts.user_id', $user_id);
-                })
-                ->paginate(10);
+            })
+            ->where(function ($query) use ($user_id) {
+                /** @var \Illuminate\Database\Query\Builder $query */
+                $query->whereNotNull('f.follower_id')
+                    ->orWhereNotNull('gu.group_id')
+                    ->orWhere('posts.user_id', $user_id);
+
+                // $query->where(function ($query) use ($user_id) {
+                //     $query->whereNotNull('gu.group_id')
+                //         ->orWhere('posts.user_id', $user_id);
+                // })->orWhereNotNull('f.follower_id');
+
+                // $query->whereNotNull('f.follower_id')
+                //     ->orWhere(function ($query) use ($user_id) {
+                //         $query->whereNotNull('gu.group_id')
+                //             ->orWhere('posts.user_id', $user_id);
+                // });
+            })
+            ->paginate(10);
 
         $posts = PostResource::collection($query);
 
         $groups = Group::query()
-                ->select(['groups.*'])
-                ->with('currentUserGroup')
-                ->join('group_users AS gu', 'gu.group_id', 'groups.id')
-                ->where('gu.user_id', auth()->id())
-                // ->where('gu.status', GroupUserStatus::APPROVED->value)
-                ->orderBy('gu.role')
-                ->orderBy('name', 'desc')
-                ->get();
-                
+            ->select(['groups.*'])
+            ->with('currentUserGroup')
+            ->join('group_users AS gu', 'gu.group_id', 'groups.id')
+            ->where('gu.user_id', auth()->id())
+            // ->where('gu.status', GroupUserStatus::APPROVED->value)
+            ->orderBy('gu.role')
+            ->orderBy('name', 'desc')
+            ->get();
+
         if ($request->wantsJson()) {
             return $posts;
         }
