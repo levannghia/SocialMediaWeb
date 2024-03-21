@@ -186,7 +186,9 @@
                 There are no pending requests.
               </div>
             </TabPanel>
-            <TabPanel class="bg-white p-3 shadow"> Photos </TabPanel>
+            <TabPanel class="bg-white p-3 shadow">
+              <TabPhotos :photos="photos"/>
+            </TabPanel>
             <TabPanel class="bg-white p-3 shadow">
               <template v-if="isCurrentUserAdmin">
                 <GroupForm :form="groupForm" />
@@ -225,6 +227,7 @@ import CreatePost from "@/Components/app/CreatePost.vue";
 import InviteUserModal from "@/Components/app/InviteUserModal.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
 import GroupForm from "@/Components/app/GroupForm.vue";
+import TabPhotos from "../Profile/TabPhotos.vue";
 
 const authUser = usePage().props.auth.user;
 
@@ -252,6 +255,8 @@ const props = defineProps({
   users: {
     type: Array,
   },
+
+  photos: Array,
 
   success: {
     type: String,

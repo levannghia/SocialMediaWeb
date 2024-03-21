@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Enums\GroupUserStatus;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\PostResource;
+use App\Http\Resources\UserResource;
 use App\Models\Group;
 use App\Models\Post;
 use Illuminate\Http\Request;
@@ -15,15 +16,16 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $user_id = auth()->id();
+        $user = $request->user();
         $query = Post::postsForTimeLine($user_id)
-            ->select('posts.*')
+            ->select(['posts.*'])
             ->leftJoin("followers AS f", function ($join) use ($user_id) {
                 $join->on("posts.user_id", "=", "f.user_id")
                     ->where("f.follower_id", $user_id);
             })
             ->leftJoin("group_users AS gu", function ($join) use ($user_id) {
                 $join->on("posts.group_id", "=", "gu.group_id")
-                    ->where("gu.user_id", $user_id)
+                    ->where("gu.user_id", "=", $user_id)
                     ->where("gu.status", GroupUserStatus::APPROVED->value);
             })
             ->where(function ($query) use ($user_id) {
@@ -43,6 +45,7 @@ class HomeController extends Controller
                 //             ->orWhere('posts.user_id', $user_id);
                 // });
             })
+            // ->whereNot('posts.user_id', $user_id)
             ->paginate(10);
 
         $posts = PostResource::collection($query);
@@ -60,10 +63,11 @@ class HomeController extends Controller
         if ($request->wantsJson()) {
             return $posts;
         }
-
+     
         return Inertia::render('Home', [
             'posts' => $posts,
             'groups' => GroupResource::collection($groups),
+            'followings' => UserResource::collection($user->followings),
         ]);
     }
 }

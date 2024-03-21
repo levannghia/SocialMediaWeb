@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Resources\PostAttachmentResource;
 use App\Http\Resources\UserResource;
 use App\Models\Follower;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -16,6 +17,7 @@ use App\Models\User;
 use App\Models\Post;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\PostResource;
+use App\Models\PostAttachment;
 
 class ProfileController extends Controller
 {
@@ -29,7 +31,6 @@ class ProfileController extends Controller
         if (!Auth::guest()) {
             $isCurrentUserFollower = Follower::where('user_id', $user->id)->where('follower_id', auth()->id())->exists();
         }
-
         $posts = Post::postsForTimeline(Auth::id())
             ->where('user_id', $user->id)
             ->whereNull('group_id')
@@ -44,7 +45,7 @@ class ProfileController extends Controller
         $followers = $user->followers;
         $followings = $user->followings;
         $followerCount = Follower::where('user_id', $user->id)->count();
-
+        $photos = PostAttachment::where('mime', 'like', 'image/%')->where('created_by', $user->id)->latest()->get();
         return Inertia::render('Profile/View', [
             'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'isCurrentUserFollower' => $isCurrentUserFollower,
@@ -53,6 +54,7 @@ class ProfileController extends Controller
             'followerCount' => $followerCount,
             'followers' => UserResource::collection($followers),
             'followings' => UserResource::collection($followings),
+            'photos' => PostAttachmentResource::collection($photos),
             'success' => session('success'),
             'user' => new UserResource($user),
         ]);

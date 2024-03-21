@@ -9,13 +9,13 @@ import FollowingList from "@/Components/app/FollowingList.vue";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 
 defineProps({
-  following: Array,
   posts: {
     type: Object,
   },
   groups: {
     type: Array
-  }
+  },
+  followings: Array,
 });
 
 </script>
@@ -28,7 +28,7 @@ defineProps({
         <GroupList :groups="groups"/>
       </div>
       <div class="lg:col-span-3 lg:order-3 h-full overflow-hidden">
-        <FollowingList :users="following" />
+        <FollowingList :users="followings" />
       </div>
       <div
         class="lg:col-span-6 lg:order-2 h-full overflow-hidden flex flex-col"

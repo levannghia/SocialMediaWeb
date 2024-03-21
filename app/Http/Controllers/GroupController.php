@@ -10,6 +10,7 @@ use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\InviteUserRequest;
 use App\Http\Resources\GroupUserResource;
+use App\Http\Resources\PostAttachmentResource;
 use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\GroupUser;
@@ -27,6 +28,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Notifications\RoleChanged;
 use App\Models\Post;
+use App\Models\PostAttachment;
 
 class GroupController extends Controller
 {
@@ -38,13 +40,13 @@ class GroupController extends Controller
         $group->load('currentUserGroup');
         $user_id = auth()->id();
 
-        if($group->hasApproveUser($user_id)) {
+        if ($group->hasApproveUser($user_id)) {
             $queryPosts = Post::postsForTimeLine($user_id)
-            ->where('group_id', $group->id)
-            ->paginate(10);
+                ->where('group_id', $group->id)
+                ->paginate(10);
 
             $posts = PostResource::collection($queryPosts);
-        }else{
+        } else {
             return Inertia::render('Group/View', [
                 'success' => session('success'),
                 'group' => new GroupResource($group),
@@ -54,10 +56,10 @@ class GroupController extends Controller
             ]);
         }
 
-        if($request->wantsJson()){
+        if ($request->wantsJson()) {
             return $posts;
         }
-        
+
         $requests = $group->pendingUsers;
         $users = User::query()
             ->select(['users.*', 'gu.status', 'gu.role', 'gu.group_id'])
@@ -67,10 +69,19 @@ class GroupController extends Controller
             ->orderBy('users.name')
             ->get();
 
+        $photos = PostAttachment::query()
+            ->select('post_attachments.*')
+            ->join('posts AS p', 'p.id', 'post_attachments.post_id')
+            ->where('p.group_id', $group->id)
+            ->where('mime', 'like', 'image/%')
+            ->latest()
+            ->get();
+
         return Inertia::render('Group/View', [
             'success' => session('success'),
             'group' => new GroupResource($group),
             'posts' => $posts,
+            'photos' => PostAttachmentResource::collection($photos),
             'users' => GroupUserResource::collection($users),
             'requests' => UserResource::collection($requests),
         ]);

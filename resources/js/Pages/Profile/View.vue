@@ -181,7 +181,9 @@
                 The user is not following to anybody
               </div>
             </TabPanel>
-            <TabPanel class="bg-white p-3 shadow"> Photos </TabPanel>
+            <TabPanel class="bg-white p-3 shadow">
+              <TabPhotos :photos="photos"/>
+            </TabPanel>
             <TabPanel>
               <Edit :mustVerifyEmail="mustVerifyEmail" :status="status" />
             </TabPanel>
@@ -212,6 +214,7 @@ import {
 // import { CameraIcon } from "@heroicons/vue/24/outline";
 import TextInput from "@/Components/TextInput.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
+import TabPhotos from "./TabPhotos.vue";
 
 const authUser = usePage().props.auth.user;
 const props = defineProps({
@@ -229,6 +232,7 @@ const props = defineProps({
   posts: Object,
   followers: Array,
   followings: Array,
+  photos: Array,
   user: {
     type: Object,
   },
