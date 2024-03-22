@@ -6,7 +6,8 @@ return [
     |--------------------------------------------------------------------------
     | OpenAI API Key and Organization
     |--------------------------------------------------------------------------
-    |
+    | OPENAI_API_KEY=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
+    | OPENAI_ORGANIZATION=org-5fRoZMWAbsA3BVOBhIb1kY3X
     | Here you may specify your OpenAI API Key and organization. This will be
     | used to authenticate with the OpenAI API - you can find your API key
     | and organization on your OpenAI dashboard, at https://openai.com.
@@ -24,8 +25,7 @@ return [
     | for a response. By default, the client will time out after 30 seconds.
     */
 
-    // OPENAI_API_KEY=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
-    // OPENAI_ORGANIZATION=org-5fRoZMWAbsA3BVOBhIb1kY3X
+    
 
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
 ];
