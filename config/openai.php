@@ -24,5 +24,8 @@ return [
     | for a response. By default, the client will time out after 30 seconds.
     */
 
+    // OPENAI_API_KEY=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
+    // OPENAI_ORGANIZATION=org-5fRoZMWAbsA3BVOBhIb1kY3X
+
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
 ];
