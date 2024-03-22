@@ -73,6 +73,9 @@ class StorePostRequest extends FormRequest
     {
         $this->merge([
             'user_id' => auth()->id(),
+            // 'body' => preg_replace_callback('/(#\#+)(?![^<]*<\/a>)/', function($a){
+            //     return '<a href="/search/'.urlencode($a[0]).'">' . $a[0] . '</a>';
+            // } ,$this->input('body') ?: ''),
             'body' => $this->input('body') ?: '',
         ]);
     }

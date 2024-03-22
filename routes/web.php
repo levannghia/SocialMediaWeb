@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/post/download/{attachment}', [PostController::class, 'downloadAttachment'])->name('post.download');
     Route::post('/post/{post}/reaction', [PostController::class, 'postReaction'])->name('post.reaction');
     Route::post('/post/{post}/comment', [PostController::class, 'postCreateComment'])->name('post.comment.create');
+    Route::post('/fetch-url-preview', [PostController::class, 'fetchUrlPreview'])->name('post.fetchUrlPreview');
     Route::post('/ai-post', [PostController::class,'aiPostContent'])->name('post.aiContent');
     Route::put('/comment/{comment}', [PostController::class, 'updateComment'])->name('comment.update');
     Route::delete('/comment/{comment}', [PostController::class, 'deleteComment'])->name('comment.delete');

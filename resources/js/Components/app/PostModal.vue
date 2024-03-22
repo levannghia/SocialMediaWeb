@@ -27,7 +27,7 @@
                 <div class="mt-2">
                   <PostUserHeader :post="post" :showTime="false" />
                   <div class="relative group">
-                    <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
+                    <ckeditor :editor="editor" v-model="form.body" :config="editorConfig" @input="onInputChange"></ckeditor>
                     <button @click="getAIContent" :disabled="aiButtonLoading"
                       class="absolute right-1 top-12 w-8 h-8 p-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white flex justify-center items-center transition-all opacity-0  group-hover:opacity-100 disabled:cursor-not-allowed disabled:bg-indigo-400 disabled:hover:bg-indigo-400">
                       <svg v-if="aiButtonLoading" class="animate-spin h-4 w-4 text-white"
@@ -156,6 +156,7 @@ const props = defineProps({
   }
 });
 
+let debounceTimeout = null;
 
 const form = useForm({
   id: null,
@@ -322,5 +323,62 @@ function getAIContent() {
       console.log(err)
       aiButtonLoading.value = false;
     })
+}
+
+function fetchPreview(url){
+  // clearTimeout(debounceTimeout);
+
+  setTimeout(() => {
+    axiosClient.post(route('post.fetchUrlPreview'), {
+      url
+    })
+    .then(res => {
+      console.log(res);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+    // debounceTimeout = null
+  }, 1000)
+}
+
+function onInputChange() {
+  let url = matchHref()
+
+    if (!url) {
+        url = matchLink()
+    }
+
+    console.log(url);
+    fetchPreview(url);
+}
+
+function matchHref() {
+    // Regular expression to match URLs
+    const urlRegex = /<a.+href="((https?):\/\/[^"]+)"/;
+
+    // Match the first URL in the HTML content
+    const match = form.body.match(urlRegex);
+
+    // Check if a match is found
+    if (match && match.length > 0) {
+        return match[1];
+    }
+    return null;
+}
+
+function matchLink() {
+    // Regular expression to match URLs
+    const urlRegex = /(?:https?):\/\/[^\s<]+/;
+
+    // Match the first URL in the HTML content
+    const match = form.body.match(urlRegex);
+
+    // Check if a match is found
+    if (match && match.length > 0) {
+        return match[0];
+    }
+    return null
 }
 </script>
