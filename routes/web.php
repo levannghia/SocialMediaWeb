@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 // use Inertia\Inertia;
@@ -112,6 +113,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/change-role/{group:slug}', [GroupController::class, 'changeRole'])->name('group.changeRole');
     Route::delete('/remove-user/{group:slug}', [GroupController::class, 'removeUser'])->name('group.removeUser');
     Route::put('/group/{group:slug}', [GroupController::class, 'update'])->name('group.update');
+
+    Route::get('/search/{search?}', [SearchController::class, 'search'])->name('search');
 });
 
 require __DIR__ . '/auth.php';

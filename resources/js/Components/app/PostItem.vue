@@ -2,7 +2,7 @@
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import { ChatBubbleLeftRightIcon, HandThumbUpIcon } from '@heroicons/vue/24/outline'
 import PostUserHeader from "@/Components/app/PostUserHeader.vue"
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { router, usePage } from "@inertiajs/vue3";
 import axiosClient from "@/axiosClient";
 import ReadMoreReadLess from "@/Components/app/ReadMoreReadLess.vue"
@@ -23,6 +23,18 @@ function openEditModal() {
 function openAttachment(index) {
   emit('attachmentClick', props.post, index);
 }
+
+const postBody = computed(() => {
+    let content = props.post.body.replace(
+        /(?:(\s+)|<p>)((#\w+)(?![^<]*<\/a>))/g,
+        (match, group1, group2) => {
+            const encodedGroup = encodeURIComponent(group2);
+            return `${group1 || ''}<a href="/search/${encodedGroup}" class="hashtag">${group2}</a>`;
+        }
+    )
+
+    return content;
+})
 
 function deletePost() {
   if (window.confirm('Bạn có chắc chắn xóa bài viết này?')) {
@@ -53,7 +65,7 @@ function sendReaction() {
       <EditDeleteDropdown :post="post" @edit="openEditModal" @delete="deletePost" />
     </div>
     <div>
-      <ReadMoreReadLess :content="post.body" />
+      <ReadMoreReadLess :content="postBody" />
     </div>
 
     <div class="grid gap-3 mb-3" :class="post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
