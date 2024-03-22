@@ -22,6 +22,7 @@ use Illuminate\Validation\Rule;
 use App\Notifications\PostDeleted;
 use Illuminate\Support\Facades\Notification;
 use Inertia\Inertia;
+use OpenAI\Laravel\Facades\OpenAI;
 
 class PostController extends Controller
 {
@@ -60,9 +61,9 @@ class PostController extends Controller
 
             $group = $post->group;
 
-            if($group){
+            if ($group) {
                 $users = $group->approvedUsers()->where('users.id', $user->id)->get();
-                if(count($users) > 0){
+                if (count($users) > 0) {
                     Notification::send($users, new PostCreated($post, $user, $group));
                 }
             }
@@ -196,7 +197,8 @@ class PostController extends Controller
         ]);
     }
 
-    public function commentReaction(Request $request, Comment $comment){
+    public function commentReaction(Request $request, Comment $comment)
+    {
         $data = $request->validate([
             'reaction' => [Rule::enum(PostReactionEnum::class)]
         ]);
@@ -279,7 +281,26 @@ class PostController extends Controller
             }
             return back();
         }
-        
+
         return response("Bạn không có quyền xóa bài viết này!", 403);
+    }
+
+    public function aiPostContent(Request $request)
+    {
+        $prompt = $request->get("prompt");
+        $result = OpenAI::chat()->create([
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => "Please generate social media post content based on the following prompt. Generated formatted content with multiple paragraphs. Put hashtags after 2 lines from the main content" . PHP_EOL . PHP_EOL . "Prompt: " . PHP_EOL
+                    . $prompt
+                ],
+            ],
+        ]);
+
+        return response()->json([
+            'content' => $result->choices[0]->message->content,
+        ]);
     }
 }

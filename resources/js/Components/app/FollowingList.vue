@@ -1,7 +1,6 @@
 <script setup>
 import FollowingListItems from "@/Components/app/FollowingListItems.vue";
 import {Disclosure, DisclosureButton, DisclosurePanel} from "@headlessui/vue";
-import GroupListItems from "@/Components/app/GroupListItems.vue";
 
 defineProps({
     users: Array
