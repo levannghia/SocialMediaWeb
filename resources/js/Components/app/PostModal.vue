@@ -28,11 +28,9 @@
                   <PostUserHeader :post="post" :showTime="false" />
                   <div class="relative group">
                     <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
-                    <button
-                    @click="getAIContent"
-                    :disabled="aiButtonLoading"
-                    class="absolute right-1 top-12 w-8 h-8 p-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white flex justify-center items-center transition-all opacity-0  group-hover:opacity-100 disabled:cursor-not-allowed disabled:bg-indigo-400 disabled:hover:bg-indigo-400">
-                    <!-- <svg v-if="aiButtonLoading" class="animate-spin h-4 w-4 text-white"
+                    <button @click="getAIContent" :disabled="aiButtonLoading"
+                      class="absolute right-1 top-12 w-8 h-8 p-1 rounded bg-indigo-500 hover:bg-indigo-600 text-white flex justify-center items-center transition-all opacity-0  group-hover:opacity-100 disabled:cursor-not-allowed disabled:bg-indigo-400 disabled:hover:bg-indigo-400">
+                      <svg v-if="aiButtonLoading" class="animate-spin h-4 w-4 text-white"
                          xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                 stroke-width="4"></circle>
@@ -45,9 +43,9 @@
                          stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
-                    </svg> -->
+                    </svg>
 
-                </button>
+                    </button>
                   </div>
 
                   <div v-if="showExtensionsText"
@@ -61,7 +59,8 @@
                     {{ formErrors.attachments }}
                   </div>
 
-                  <div class="grid gap-3 mt-3" :class="computedAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
+                  <div class="grid gap-3 mt-3"
+                    :class="computedAttachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">
                     <template v-for="(attachment, index) of computedAttachments" :key="attachment.id">
                       <div
                         class="group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative border-2"
@@ -135,6 +134,7 @@ import {
 import { useForm, usePage } from "@inertiajs/vue3";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { isImage } from "@/helpers";
+import axiosClient from "@/axiosClient.js";
 
 const attachmentExtensions = usePage().props.attachmentExtensions;
 const editor = ClassicEditor;
@@ -222,7 +222,7 @@ watch(() => props.post, () => {
 })
 
 function submit() {
-  if(props.group){
+  if (props.group) {
     form.group_id = props.group.id;
   }
 
@@ -303,5 +303,24 @@ function removeFile(myFile) {
     form.deleted_file_ids.push(myFile.id);
     myFile.deleted = true;
   }
+}
+
+function getAIContent() {
+  if(!form.body){
+    return
+  }
+
+  aiButtonLoading.value = true
+  axiosClient.post(route('post.aiContent'), {
+    prompt: form.body
+  })
+    .then(({ data }) => {
+      form.body = data.content
+      aiButtonLoading.value = false;
+    })
+    .catch(err => {
+      console.log(err)
+      aiButtonLoading.value = false;
+    })
 }
 </script>

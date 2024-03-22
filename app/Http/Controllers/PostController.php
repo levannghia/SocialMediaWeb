@@ -288,19 +288,20 @@ class PostController extends Controller
     public function aiPostContent(Request $request)
     {
         $prompt = $request->get("prompt");
-        $result = OpenAI::chat()->create([
-            'model' => 'gpt-3.5-turbo',
-            'messages' => [
-                [
-                    'role' => 'user',
-                    'content' => "Please generate social media post content based on the following prompt. Generated formatted content with multiple paragraphs. Put hashtags after 2 lines from the main content" . PHP_EOL . PHP_EOL . "Prompt: " . PHP_EOL
-                    . $prompt
-                ],
-            ],
-        ]);
+        // $result = OpenAI::chat()->create([
+        //     'model' => 'gpt-3.5-turbo',
+        //     'messages' => [
+        //         [
+        //             'role' => 'user',
+        //             'content' => "Please generate social media post content based on the following prompt. Generated formatted content with multiple paragraphs. Put hashtags after 2 lines from the main content" . PHP_EOL . PHP_EOL . "Prompt: " . PHP_EOL
+        //             . $prompt
+        //         ],
+        //     ],
+        // ]);
 
         return response()->json([
-            'content' => $result->choices[0]->message->content,
+            // 'content' => $result->choices[0]->message->content,
+            'content' => "\"🎉 Exciting news! We're thrilled to announce that we just released a brand new feature on our app/website! 💥 Get ready to experience the next level of convenience and efficiency with this game-changing addition. 🚀 Try it out now and let us know what you think! 😍 #NewFeatureAlert #UpgradeYourExperience\""
         ]);
     }
 }

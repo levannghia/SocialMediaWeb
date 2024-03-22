@@ -6,8 +6,8 @@ return [
     |--------------------------------------------------------------------------
     | OpenAI API Key and Organization
     |--------------------------------------------------------------------------
-    | OPENAI_API_KEY=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
-    | OPENAI_ORGANIZATION=org-5fRoZMWAbsA3BVOBhIb1kY3X
+    | OPENAI_API_KEY=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
+    | OPENAI_ORGANIZATION=org-6xFcCPYGw2z59Ocp9svq3rcL
     | Here you may specify your OpenAI API Key and organization. This will be
     | used to authenticate with the OpenAI API - you can find your API key
     | and organization on your OpenAI dashboard, at https://openai.com.
