@@ -223,6 +223,7 @@ watch(() => props.post, () => {
   // console.log("change", props.post);
   form.id = props.post.id;
   form.body = props.post.body || '';
+  onInputChange();
 })
 
 function submit() {

@@ -73,13 +73,26 @@ class StorePostRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $body = $this->input('body') ?: '';
+        $previewUrl = $this->input('preview_url') ?: '';
+
+        $trimmedBody = trim(strip_tags($body));
+        if ($trimmedBody === $previewUrl) {
+            $body = '';
+        }
+
+        // Add your custom key to the request data
         $this->merge([
-            'user_id' => auth()->id(),
-            // 'body' => preg_replace_callback('/(#\#+)(?![^<]*<\/a>)/', function($a){
-            //     return '<a href="/search/'.urlencode($a[0]).'">' . $a[0] . '</a>';
-            // } ,$this->input('body') ?: ''),
-            'body' => $this->input('body') ?: '',
+            'user_id' => auth()->user()->id,
+            'body' => $body
         ]);
+        // $this->merge([
+        //     'user_id' => auth()->id(),
+        //     // 'body' => preg_replace_callback('/(#\#+)(?![^<]*<\/a>)/', function($a){
+        //     //     return '<a href="/search/'.urlencode($a[0]).'">' . $a[0] . '</a>';
+        //     // } ,$this->input('body') ?: ''),
+        //     'body' => $this->input('body') ?: '',
+        // ]);
     }
 
     public function messages()
