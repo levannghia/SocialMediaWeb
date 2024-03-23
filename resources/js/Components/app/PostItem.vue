@@ -9,6 +9,7 @@ import ReadMoreReadLess from "@/Components/app/ReadMoreReadLess.vue"
 import EditDeleteDropdown from "./EditDeleteDropdown.vue";
 import PostAttachments from "./PostAttachments.vue";
 import CommentList from "./CommentList.vue";
+import UrlPreview from "./UrlPreview.vue";
 
 const props = defineProps({
   post: Object,
@@ -64,8 +65,9 @@ function sendReaction() {
 
       <EditDeleteDropdown :post="post" @edit="openEditModal" @delete="deletePost" />
     </div>
-    <div>
+    <div class="mb-3">
       <ReadMoreReadLess :content="postBody" />
+      <UrlPreview :preview="post.preview" :url="post.preview_url"/>
     </div>
 
     <div class="grid gap-3 mb-3" :class="post.attachments.length === 1 ? 'grid-cols-1' : 'grid-cols-2'">

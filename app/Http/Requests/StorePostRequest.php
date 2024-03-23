@@ -34,6 +34,8 @@ class StorePostRequest extends FormRequest
         return [
             'body' => ['nullable', 'string'],
             'user_id' => ['numeric'],
+            'preview' => ['nullable', 'array'],
+            'preview_url' => ['nullable', 'string'],
             'group_id' => ['nullable', 'exists:groups,id', function ($attribute, $value, $fail) {
                 $groupUser = GroupUser::where('user_id', auth()->id())
                     ->where('group_id', $value)
