@@ -7,6 +7,7 @@ import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link, usePage, router } from "@inertiajs/vue3";
 import TextInput from "@/Components/TextInput.vue";
+import {MoonIcon} from '@heroicons/vue/24/solid'
 
 const showingNavigationDropdown = ref(false);
 const authUser = usePage().props.auth.user;
@@ -41,9 +42,9 @@ function search() {
           <div class="flex items-center gap-3 flex-1">
             <TextInput v-model="keywords" placeholder="Search on the website" class="w-full" @keyup.enter="search" />
 
-            <!-- <button @click="toggleDarkMode" class="dark:text-white">
+            <button class="dark:text-white">
               <MoonIcon class="w-5 h-5" />
-            </button> -->
+            </button>
           </div>
           <div class="hidden sm:flex sm:items-center sm:ms-6">
             <!-- Settings Dropdown -->

@@ -337,4 +337,9 @@ class PostController extends Controller
 
         return $ogTags;
     }
+
+
+    public function pinUppin(Request $request, Post $post){
+
+    }
 }
