@@ -58,6 +58,14 @@ const pinAllowed = computed(() => {
     return user.value.id === authUser.id || props.post.group && props.post.group.role === 'admin'
 })
 
+const isPinned = computed(() => {
+    if (group?.id) {
+        return group?.pinned_post_id === props.post.id
+    }
+
+    return authUser?.pinned_post_id === props.post.id
+})
+
 </script>
 
 <template>
@@ -115,7 +123,7 @@ const pinAllowed = computed(() => {
                             <MapPinIcon
                                 class="mr-2 h-5 w-5"
                                 aria-hidden="true" />
-                            {{ group?.pinned_post_id === props.post.id ? 'Unpin' : 'Pin' }}
+                            {{ isPinned ? 'Unpin' : 'Pin' }}
                         </button>
                     </MenuItem>
                     <MenuItem v-if="editAllowed" v-slot="{ active }">
