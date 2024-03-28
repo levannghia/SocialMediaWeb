@@ -60,9 +60,9 @@ class Post extends Model
         return $this->user_id == $userId;
     }
 
-    public static function postsForTimeLine($user_id)
+    public static function postsForTimeLine($user_id, $getLatest = true)
     {
-        return Post::query()
+        $query = Post::query()
             ->withCount(['reactions', 'comments'])
             ->with([
                 // 'group' => function ($query) {
@@ -85,8 +85,13 @@ class Post extends Model
                                 },
                             ]);
                 },
-            ])
-            ->latest();
+            ]);
+
+            if($getLatest){
+                $query->latest();
+            }
+
+            return $query;
     }
 
     protected static function boot(){

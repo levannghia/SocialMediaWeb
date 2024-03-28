@@ -41,8 +41,11 @@ class GroupController extends Controller
         $user_id = auth()->id();
 
         if ($group->hasApproveUser($user_id)) {
-            $queryPosts = Post::postsForTimeLine($user_id)
+            $queryPosts = Post::postsForTimeLine($user_id, false)
+                ->leftJoin('groups as g', 'g.pinned_post_id', 'posts.id')
                 ->where('group_id', $group->id)
+                ->orderBy('g.pinned_post_id', 'desc')
+                ->orderBy('posts.created_at', 'desc')
                 ->paginate(10);
 
             $posts = PostResource::collection($queryPosts);

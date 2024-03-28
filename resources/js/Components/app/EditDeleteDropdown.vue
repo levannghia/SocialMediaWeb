@@ -115,7 +115,7 @@ const pinAllowed = computed(() => {
                             <MapPinIcon
                                 class="mr-2 h-5 w-5"
                                 aria-hidden="true" />
-                            Pin
+                            {{ group?.pinned_post_id === props.post.id ? 'Unpin' : 'Pin' }}
                         </button>
                     </MenuItem>
                     <MenuItem v-if="editAllowed" v-slot="{ active }">
