@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 // use Inertia\Inertia;
 // use Goutte\Client;
@@ -26,6 +27,13 @@ Route::get('/', [HomeController::class, 'index'])->middleware(['auth', 'verified
 Route::get('/u/{user:username}', [ProfileController::class, 'index'])->name('profile');
 Route::get('/g/{group:slug}', [GroupController::class, 'profile'])->name('group.profile');
 Route::get('/group/approve-invitation/{token}', [GroupController::class, 'approveInvitation'])->name('group.approveInvitation');
+Route::get('/artisan-storage-link', function(){
+    return Artisan::call('storage:link');
+});
+
+Route::get('/artisan-optimize', function(){
+    return Artisan::call('optimize');
+});
 
 // Route::domain('{account}.127.0.0.1:8000')->group(function () {
 //     Route::get('user/{id}', function (string $account, string $id) {

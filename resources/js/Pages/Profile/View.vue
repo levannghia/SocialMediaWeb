@@ -14,7 +14,7 @@
       >
         {{ errors.cover }}
       </div>
-      <div class="relative bg-white group">
+      <div class="relative bg-white group dark:bg-slate-950 dark:text-gray-100">
         <img
           :src="
             coverImageSrc || user.cover_url || '/images/defaut_cover_photo.jpg'
@@ -113,7 +113,7 @@
       </div>
       <div>
         <TabGroup>
-          <TabList class="flex bg-white">
+          <TabList class="flex bg-white dark:bg-slate-950 dark:text-white">
             <Tab v-slot="{ selected }" as="template">
               <TabItem text="Posts" :selected="selected" />
             </Tab>
@@ -181,7 +181,7 @@
                 The user is not following to anybody
               </div>
             </TabPanel>
-            <TabPanel class="bg-white p-3 shadow">
+            <TabPanel class="p-3">
               <TabPhotos :photos="photos"/>
             </TabPanel>
             <TabPanel>
