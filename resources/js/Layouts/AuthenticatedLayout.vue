@@ -16,6 +16,18 @@ const keywords = ref('');
 function search() {
   router.get(route('search', encodeURIComponent(keywords.value)))
 }
+
+function toggleDrakMode() {
+  const html = window.document.documentElement;
+
+  if(html.classList.contains('dark')){
+    html.classList.remove('dark');
+    localStorage.setItem('darkMode', '0');
+  }else{
+    html.classList.add('dark');
+    localStorage.setItem('darkMode', '1');
+  }
+}
 </script>
 
 <template>
@@ -42,7 +54,7 @@ function search() {
           <div class="flex items-center gap-3 flex-1">
             <TextInput v-model="keywords" placeholder="Search on the website" class="w-full" @keyup.enter="search" />
 
-            <button class="dark:text-white">
+            <button class="dark:text-white" @click="toggleDrakMode">
               <MoonIcon class="w-5 h-5" />
             </button>
           </div>

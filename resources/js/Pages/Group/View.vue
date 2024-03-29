@@ -1,54 +1,33 @@
 <template>
+
   <Head :title="group.name" />
   <AuthenticatedLayout>
     <div class="max-w-[768px] mx-auto h-full overflow-auto">
-      <div
-        v-show="showNotification && success"
-        class="font-medium text-sm text-white bg-emerald-500 my-2 py-2 px-3"
-      >
+      <div v-show="showNotification && success" class="font-medium text-sm text-white bg-emerald-500 my-2 py-2 px-3">
         {{ success }}
       </div>
-      <div
-        v-if="errors.cover"
-        class="font-medium text-sm text-white bg-red-400 my-2 py-2 px-3"
-      >
+      <div v-if="errors.cover" class="font-medium text-sm text-white bg-red-400 my-2 py-2 px-3">
         {{ errors.cover }}
       </div>
-      <div class="relative bg-white group">
-        <img
-          :src="
-            coverImageSrc || group.cover_url || '/images/defaut_cover_photo.jpg'
-          "
-          class="w-full h-[200px] object-cover"
-        />
+      <div class="relative bg-white group dark:bg-slate-950 dark:text-gray-100">
+        <img :src="coverImageSrc || group.cover_url || '/images/defaut_cover_photo.jpg'
+    " class="w-full h-[200px] object-cover" />
         <div class="absolute top-2 right-2">
-          <button
-            v-if="isCurrentUserAdmin && !coverImageSrc"
-            class="opacity-0 group-hover:opacity-100 transition-all flex items-center bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-sm"
-          >
-            <CameraIcon class="w-4 h-4 mr-2"/>
+          <button v-if="isCurrentUserAdmin && !coverImageSrc"
+            class="opacity-0 group-hover:opacity-100 transition-all flex items-center bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-sm">
+            <CameraIcon class="w-4 h-4 mr-2" />
             Upload
-            <input
-              type="file"
-              class="absolute top-0 left-0 right-0 bottom-0 opacity-0 cursor-pointer"
-              @change="onCoverChange"
-            />
+            <input type="file" class="absolute top-0 left-0 right-0 bottom-0 opacity-0 cursor-pointer"
+              @change="onCoverChange" />
           </button>
-          <div
-            v-else-if="isCurrentUserAdmin"
-            class="flex whitespace-nowrap gap-2 opacity-0 group-hover:opacity-100"
-          >
-            <button
-              @click="cancelCoverImage"
-              class="transition-all flex items-center bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-sm"
-            >
+          <div v-else-if="isCurrentUserAdmin" class="flex whitespace-nowrap gap-2 opacity-0 group-hover:opacity-100">
+            <button @click="cancelCoverImage"
+              class="transition-all flex items-center bg-gray-50 hover:bg-gray-100 text-gray-800 py-1 px-2 text-sm">
               <XMarkIcon class="w-4 h-4" />
               Cancel
             </button>
-            <button
-              @click="submitCoverImage"
-              class="transition-all flex items-center bg-gray-800 hover:bg-gray-900 text-gray-100 py-1 px-2 text-sm"
-            >
+            <button @click="submitCoverImage"
+              class="transition-all flex items-center bg-gray-800 hover:bg-gray-900 text-gray-100 py-1 px-2 text-sm">
               <CheckIcon class="w-4 h-4" />
               Submit
             </button>
@@ -56,72 +35,43 @@
         </div>
         <div class="flex">
           <div
-            class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full"
-          >
-            <img
-              :src="
-                thumbnailImageSrc ||
-                group.thumbnail_url ||
-                '/images/user_default.png'
-              "
-              class="w-full h-full object-cover rounded-full"
-            />
-            <button
-              v-if="isCurrentUserAdmin && !thumbnailImageSrc"
-              class="absolute left-0 top-0 right-0 bottom-0 bg-black/50 text-gray-200 rounded-full opacity-0 flex items-center justify-center group-hover/avatar:opacity-100"
-            >
+            class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full">
+            <img :src="thumbnailImageSrc ||
+    group.thumbnail_url ||
+    '/images/user_default.png'
+    " class="w-full h-full object-cover rounded-full" />
+            <button v-if="isCurrentUserAdmin && !thumbnailImageSrc"
+              class="absolute left-0 top-0 right-0 bottom-0 bg-black/50 text-gray-200 rounded-full opacity-0 flex items-center justify-center group-hover/avatar:opacity-100">
               <CameraIcon class="w-8 h-8" />
 
-              <input
-                type="file"
-                class="absolute left-0 top-0 bottom-0 right-0 opacity-0"
-                @change="onThumbnailChange"
-              />
+              <input type="file" class="absolute left-0 top-0 bottom-0 right-0 opacity-0" @change="onThumbnailChange" />
             </button>
-            <div
-              v-else-if="isCurrentUserAdmin"
-              class="absolute top-1 right-0 flex flex-col gap-2"
-            >
-              <button
-                @click="resetThumbnailImage"
-                class="w-7 h-7 flex items-center justify-center bg-red-500/80 text-white rounded-full"
-              >
+            <div v-else-if="isCurrentUserAdmin" class="absolute top-1 right-0 flex flex-col gap-2">
+              <button @click="resetThumbnailImage"
+                class="w-7 h-7 flex items-center justify-center bg-red-500/80 text-white rounded-full">
                 <XMarkIcon class="h-5 w-5" />
               </button>
-              <button
-                @click="submitThumbnailImage"
-                class="w-7 h-7 flex items-center justify-center bg-emerald-500/80 text-white rounded-full"
-              >
+              <button @click="submitThumbnailImage"
+                class="w-7 h-7 flex items-center justify-center bg-emerald-500/80 text-white rounded-full">
                 <CheckCircleIcon class="h-5 w-5" />
               </button>
             </div>
           </div>
           <div class="flex-1 p-3 flex justify-between items-center">
             <h2 class="font-semibold text-lg">{{ group.name }}</h2>
-            <PrimaryButton v-if="!authUser" :href="route('login')"
-              >Login to join to this group</PrimaryButton
-            >
-            <PrimaryButton
-              v-if="authUser && isCurrentUserAdmin"
-              @click="showInviteUserModal = true"
-              >Invite Users
+            <PrimaryButton v-if="!authUser" :href="route('login')">Login to join to this group</PrimaryButton>
+            <PrimaryButton v-if="authUser && isCurrentUserAdmin" @click="showInviteUserModal = true">Invite Users
             </PrimaryButton>
-            <PrimaryButton
-              v-if="authUser && !group.role && group.auto_approval"
-              @click="joinToGroup"
-              >Join To Group
+            <PrimaryButton v-if="authUser && !group.role && group.auto_approval" @click="joinToGroup">Join To Group
             </PrimaryButton>
-            <PrimaryButton
-              v-if="authUser && !group.role && !group.auto_approval"
-              @click="joinToGroup"
-              >Request To Join
+            <PrimaryButton v-if="authUser && !group.role && !group.auto_approval" @click="joinToGroup">Request To Join
             </PrimaryButton>
           </div>
         </div>
       </div>
       <div>
         <TabGroup>
-          <TabList class="flex bg-white">
+          <TabList class="flex bg-white dark:bg-slate-950 dark:text-white">
             <Tab v-slot="{ selected }" as="template">
               <TabItem text="Posts" :selected="selected" />
             </Tab>
@@ -140,65 +90,46 @@
           </TabList>
 
           <TabPanels class="mt-2">
-            <TabPanel class="bg-white p-3 shadow">
+            <TabPanel>
               <template v-if="posts">
-                <CreatePost :group="group"/>
+                <CreatePost :group="group" />
                 <PostList v-if="posts.data.length" :posts="posts.data" />
                 <div v-else class="py-8 text-center dark:text-gray-100">
                   There are no posts in this group. Be the first and create it.
                 </div>
               </template>
+              <div v-else class="py-8 text-center dark:text-gray-100">
+                You don't have permission to view these posts.
+              </div>
             </TabPanel>
-            <TabPanel v-if="isJoinedGroup" class="bg-white p-3 shadow">
+            <TabPanel v-if="isJoinedGroup">
               <div class="mb-3">
-                <TextInput
-                  :model-value="searchKeyword"
-                  placeholder="Type to search"
-                  class="w-full"
-                />
+                <TextInput :model-value="searchKeyword" placeholder="Type to search" class="w-full" />
               </div>
               <div class="grid grid-cols-2 gap-3">
-                <UserListItem
-                  v-for="user of users"
-                  :user="user"
-                  :key="user.id"
-                  :show-role-dropdown="isCurrentUserAdmin"
-                  :disable-role-dropdown="group.user_id === user.id"
-                  class="shadow rounded-lg"
-                  @role-change="onRoleChange"
-                  @delete="deleteUser"
-                />
+                <UserListItem v-for="user of users" :user="user" :key="user.id" :show-role-dropdown="isCurrentUserAdmin"
+                  :disable-role-dropdown="group.user_id === user.id" class="shadow rounded-lg"
+                  @role-change="onRoleChange" @delete="deleteUser" />
               </div>
             </TabPanel>
-            <TabPanel v-if="isCurrentUserAdmin" class="bg-white p-3 shadow">
+            <TabPanel v-if="isCurrentUserAdmin">
               <div v-if="requests.length" class="grid grid-cols-2 gap-3">
-                <UserListItem
-                  v-for="user of requests"
-                  :user="user"
-                  :key="user.id"
-                  :forApprove="true"
-                  @approve="approveUser"
-                  @reject="rejectUser"
-                  class="shadow rounded-lg"
-                />
+                <UserListItem v-for="user of requests" :user="user" :key="user.id" :forApprove="true"
+                  @approve="approveUser" @reject="rejectUser" class="shadow rounded-lg" />
               </div>
               <div v-else class="py-8 text-center dark:text-gray-100">
                 There are no pending requests.
               </div>
             </TabPanel>
-            <TabPanel class="bg-white p-3 shadow">
-              <TabPhotos :photos="photos"/>
+            <TabPanel>
+              <TabPhotos :photos="photos" />
             </TabPanel>
-            <TabPanel class="bg-white p-3 shadow">
+            <TabPanel>
               <template v-if="isCurrentUserAdmin">
                 <GroupForm :form="groupForm" />
                 <PrimaryButton @click="updateGroup"> Submit </PrimaryButton>
               </template>
-              <div
-                v-else
-                class="ck-content-output dark:text-gray-100"
-                v-html="group.about"
-              ></div>
+              <div v-else class="ck-content-output dark:text-gray-100" v-html="group.about"></div>
             </TabPanel>
           </TabPanels>
         </TabGroup>

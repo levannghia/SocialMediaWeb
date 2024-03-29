@@ -14,7 +14,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="flex items-center gap-2 mb-3">
+  <div class="flex items-center gap-2">
     <Link :href="route('profile', post.user.username)">
       <img
         :src="post.user.avatar_url"

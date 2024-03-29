@@ -7,6 +7,15 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy/dist/vue.m';
 import CKEditor from '@ckeditor/ckeditor5-vue';
 
+const html = window.document.documentElement;
+
+const darkMode = parseInt(localStorage.getItem('darkMode') || 1);
+if(darkMode){
+    html.classList.add('dark');
+}else{
+    html.classList.remove('dark');
+}
+
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
