@@ -16,6 +16,7 @@
       </div>
       <div class="relative bg-white group dark:bg-slate-950 dark:text-gray-100">
         <img
+          loading="lazy"
           :src="
             coverImageSrc || user.cover_url || '/images/defaut_cover_photo.jpg'
           "
@@ -60,6 +61,7 @@
             class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full"
           >
             <img
+              loading="lazy"
               :src="
                 avatarImageSrc || user.avatar_url || '/images/user_default.png'
               "

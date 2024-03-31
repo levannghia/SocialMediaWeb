@@ -12,7 +12,7 @@ defineProps({
 <template>
   <div class="cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800">
     <Link :href="route('group.profile', group.slug)" class="flex items-start gap-1 py-2 px-2">
-    <img :src="group.thumbnail_url" class="w-[40px] h-[40px] rounded-full" />
+    <img :src="group.thumbnail_url" class="w-[40px] h-[40px] rounded-full" loading="lazy"/>
     <div class="flex-1">
       <div class="flex items-center justify-between">
         <h3 class="font-black">{{ group.name }}</h3>

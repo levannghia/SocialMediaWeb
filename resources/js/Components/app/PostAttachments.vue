@@ -35,6 +35,7 @@ const emit = defineEmits(["attachmentClick"]);
       <img
         v-if="isImage(attachment)"
         :src="attachment.url"
+        loading="lazy"
         alt=""
         class="object-contain aspect-square max-h-full max-w-full"
       />
@@ -63,7 +64,7 @@ const emit = defineEmits(["attachmentClick"]);
         </svg>
 
         <div class="absolute left-0 top-0 w-full h-full bg-black/50 z-9"></div>
-        <video :src="attachment.url"></video>
+        <video loading="lazy" :src="attachment.url"></video>
       </div>
       <template v-else>
         <PaperClipIcon class="w-10 h-10 mb-3" />

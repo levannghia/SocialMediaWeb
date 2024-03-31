@@ -108,7 +108,7 @@ function onCommentDelete(comment) {
 <template>
     <div v-if="authUser" class="flex gap-2 mb-3 mt-3">
         <Link :href="route('profile', authUser.username)">
-        <img :src="authUser.avatar_url"
+        <img :src="authUser.avatar_url" loading="lazy"
             class="w-[40px] h-[40px] rounded-full border-2 transition-all hover:border-blue-500" />
         </Link>
         <div class="flex flex-1">
@@ -122,7 +122,7 @@ function onCommentDelete(comment) {
             <div class="flex justify-between gap-2">
                 <div class="flex gap-2">
                     <a href="javascript:void(0)">
-                        <img :src="comment.user.avatar_url" alt=""
+                        <img loading="lazy" :src="comment.user.avatar_url" alt=""
                             class="w-[40px] h-[40px] rounded-full border-2 hover:border-blue-500 transition-all" />
                     </a>
                     <div>

@@ -10,7 +10,7 @@
         {{ errors.cover }}
       </div>
       <div class="relative bg-white group dark:bg-slate-950 dark:text-gray-100">
-        <img :src="coverImageSrc || group.cover_url || '/images/defaut_cover_photo.jpg'
+        <img loading="lazy" :src="coverImageSrc || group.cover_url || '/images/defaut_cover_photo.jpg'
     " class="w-full h-[200px] object-cover" />
         <div class="absolute top-2 right-2">
           <button v-if="isCurrentUserAdmin && !coverImageSrc"
@@ -36,7 +36,9 @@
         <div class="flex">
           <div
             class="flex items-center justify-center relative group/avatar -mt-[64px] ml-[48px] w-[128px] h-[128px] rounded-full">
-            <img :src="thumbnailImageSrc ||
+            <img 
+            loading="lazy"
+            :src="thumbnailImageSrc ||
     group.thumbnail_url ||
     '/images/user_default.png'
     " class="w-full h-full object-cover rounded-full" />

@@ -10,6 +10,7 @@ defineProps({
        v-if="preview && preview.title"
        class="block mt-4 border border-indigo-200 bg-indigo-50">
         <img :src="preview.image"
+            loading="lazy"
              class="max-w-full"
              :alt="preview.title"/>
         <div class="p-2 dark:text-gray-900">

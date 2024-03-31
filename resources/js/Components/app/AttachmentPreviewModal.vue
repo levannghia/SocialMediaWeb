@@ -60,6 +60,7 @@
                     class="flex items-center justify-center w-full h-full p-3"
                   >
                     <img
+                      loading="lazy"
                       v-if="isImage(attachment)"
                       :src="attachment.url"
                       class="max-w-full max-h-full"
@@ -68,7 +69,7 @@
                       v-else-if="isVideo(attachment)"
                       class="flex items-center"
                     >
-                      <video :src="attachment.url" controls autoplay class="max-h-[500px]"></video>
+                      <video loading="lazy" :src="attachment.url" controls autoplay class="max-h-[500px]"></video>
                     </div>
                     <div
                       v-else

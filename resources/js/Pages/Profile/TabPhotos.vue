@@ -37,6 +37,7 @@ function openPhoto(index) {
 
         <img
           v-if="isImage(attachment)"
+          loading="lazy"
           :src="attachment.url"
           class="object-contain aspect-square"
         />

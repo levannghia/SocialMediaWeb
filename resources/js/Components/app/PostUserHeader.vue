@@ -18,6 +18,7 @@ defineProps({
     <Link :href="route('profile', post.user.username)">
       <img
         :src="post.user.avatar_url"
+        loading="lazy"
         alt=""
         class="w-[42px] h-[42px] rounded-full border-2 hover:border-blue-500 transition-all"
       />
