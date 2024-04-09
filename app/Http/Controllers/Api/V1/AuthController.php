@@ -19,7 +19,7 @@ class AuthController extends Controller
     public function register(StoreUserRequest $request)
     {
         $data = $request->validated();
-        $minute = 1;
+        $minute = 2;
         try {
             $opt = mt_rand(0000, 9999);
 
