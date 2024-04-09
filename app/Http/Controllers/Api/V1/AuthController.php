@@ -8,23 +8,32 @@ use App\Http\Requests\StoreUserRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Notifications\VerificationEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
     public function register(StoreUserRequest $request)
     {
         $data = $request->validated();
+        $minute = 1;
         try {
+            $opt = mt_rand(0000, 9999);
+
             $user = User::create([
                 'name' => $data['fullname'],
                 'email' => $data['email'],
-                'password' => Hash::make($data['password'])
+                'password' => Hash::make($data['password']),
+                'otp' => $opt,
+                'otp_expire_date' => Carbon::now()->addMinutes($minute)
             ]);
 
             $token = $user->createToken('user_token')->plainTextToken;
+
+            $user->notify(new VerificationEmail($opt, $minute));
 
             return response()->json([
                 'data' => new UserResource($user),

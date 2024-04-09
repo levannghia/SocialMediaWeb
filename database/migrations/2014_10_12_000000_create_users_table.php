@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('username');
             $table->string('cover_path', 1024)->nullable();
             $table->string('avatar_path', 1024)->nullable();
+            $table->integer('otp')->nullable();
+            $table->timestamp('otp_expire_date')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->foreignId('pinned_post_id')->nullable()->constrained('posts');
