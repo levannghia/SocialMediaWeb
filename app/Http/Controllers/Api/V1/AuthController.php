@@ -21,7 +21,7 @@ class AuthController extends Controller
     public function register(StoreUserRequest $request)
     {
         $data = $request->validated();
-        
+
         try {
             $otp = mt_rand(0000, 9999);
 
@@ -193,6 +193,32 @@ class AuthController extends Controller
             return response()->json([
                 'error' => $e->getMessage(),
                 'message' => 'Register error!'
+            ], 500);
+        }
+    }
+
+    public function logout(Request $request){
+        $validator = Validator::make($request->all(), [
+            "email" => ["email", "required"],
+        ]);
+
+        try {   
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors(),
+                    'message' => 'Logout Fails!!!'
+                ], 422);
+            }
+
+            $user = User::where('email', $request->input('data'))->first();
+            $user->tokens()->delete();
+            
+            return response()->json('User logged out!', 200);
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Logout error!'
             ], 500);
         }
     }

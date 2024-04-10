@@ -26,6 +26,10 @@ Route::prefix('auth')->name('api.auth.')->group(function(){
     Route::post('/resen-verification', [AuthController::class, 'resendVerificationOTP'])->name('resendVerification');
 });
 
+Route::middleware('auth:sanctum')->group(function() {
+    Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
+});
+
 Route::get('/test', function (){
     return response()->json([
         'test' => 'OK2',
