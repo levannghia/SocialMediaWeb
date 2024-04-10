@@ -21,6 +21,7 @@ class AuthController extends Controller
     public function register(StoreUserRequest $request)
     {
         $data = $request->validated();
+        
         try {
             $otp = mt_rand(0000, 9999);
 
@@ -32,13 +33,11 @@ class AuthController extends Controller
                 'otp_expire_date' => Carbon::now()->addMinutes($this->minute)
             ]);
 
-            $token = $user->createToken('user_token')->plainTextToken;
-
             $user->notify(new VerificationEmail($otp, $this->minute));
 
             return response()->json([
                 'data' => new UserResource($user),
-                'token' => $token,
+                'token' => '',
                 'message' => 'Đăng ký thành công!'
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -80,8 +79,11 @@ class AuthController extends Controller
                     $user->otp_expire_date = null;
 
                     $user->save();
+                    $token = $user->createToken('user_token')->plainTextToken;
 
                     return response()->json([
+                        'data' => new UserResource($user),
+                        'token' => $token,
                         'message' => 'Xác thực thành công!'
                     ], 200);
                 }
