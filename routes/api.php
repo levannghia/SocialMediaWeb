@@ -22,6 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('auth')->name('api.auth.')->group(function(){
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/verification', [AuthController::class, 'verificationOTP'])->name('verification');
+    Route::post('/resen-verification', [AuthController::class, 'resendVerificationOTP'])->name('resendVerification');
 });
 
 Route::get('/test', function (){

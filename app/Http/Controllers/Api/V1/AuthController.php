@@ -16,31 +16,31 @@ use Carbon\Carbon;
 
 class AuthController extends Controller
 {
+    private int $minute = 2;
+
     public function register(StoreUserRequest $request)
     {
         $data = $request->validated();
-        $minute = 2;
         try {
-            $opt = mt_rand(0000, 9999);
+            $otp = mt_rand(0000, 9999);
 
             $user = User::create([
                 'name' => $data['fullname'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
-                'otp' => $opt,
-                'otp_expire_date' => Carbon::now()->addMinutes($minute)
+                'otp' => $otp,
+                'otp_expire_date' => Carbon::now()->addMinutes($this->minute)
             ]);
 
             $token = $user->createToken('user_token')->plainTextToken;
 
-            $user->notify(new VerificationEmail($opt, $minute));
+            $user->notify(new VerificationEmail($otp, $this->minute));
 
             return response()->json([
                 'data' => new UserResource($user),
                 'token' => $token,
                 'message' => 'Đăng ký thành công!'
             ], 201);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Trả về lỗi validation
             return response()->json([
@@ -52,6 +52,97 @@ class AuthController extends Controller
             return response()->json([
                 'error' => $e->getMessage(),
                 'message' => 'Register error!'
+            ], 500);
+        }
+    }
+
+    public function verificationOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "email" => ["email", "required"],
+            "otp" => ['numeric', 'required'],
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors(),
+                    'message' => 'verification OTP Fails!!!'
+                ], 422);
+            }
+
+            $user = User::where('email', $request->input('email'))->where('otp', $request->input('otp'))->where('email_verified_at', null)->first();
+
+            if ($user) {
+                if ($user->otp_expire_date > Carbon::now()) {
+                    $user->email_verified_at = Carbon::now();
+                    $user->otp = null;
+                    $user->otp_expire_date = null;
+
+                    $user->save();
+
+                    return response()->json([
+                        'message' => 'Xác thực thành công!'
+                    ], 200);
+                }
+
+                return response()->json([
+                    'message' => 'OTP đã hết hạn !!!'
+                ], 403);
+            }
+
+            return response()->json([
+                'message' => 'OTP không chính xác !!!'
+            ], 403);
+
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'verification OTP error!'
+            ], 500);
+        }
+    }
+
+    public function resendVerificationOTP(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "email" => ["email", "required"],
+        ]);
+
+        $otp = mt_rand(0000, 9999);
+        try {
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors(),
+                    'message' => 'verification OTP Fails!!!'
+                ], 422);
+            }
+
+            $user = User::where('email', $request->input('email'))->where('otp', '!=', null)->where('email_verified_at', null)->first();
+
+            if ($user) {
+                $user->otp = $otp;
+                $user->otp_expire_date = Carbon::now()->addMinutes($this->minute);
+
+                $user->save();
+                
+                $user->notify(new VerificationEmail($otp, $this->minute));
+
+                return response()->json([
+                    'message' => 'OTP gửi thành công!'
+                ], 200);
+            }
+
+            return response()->json([
+                'message' => 'Gửi OTP thất bại!!!'
+            ], 400);
+
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Resend Verification OTP error!'
             ], 500);
         }
     }
@@ -79,7 +170,6 @@ class AuthController extends Controller
                     ],
                     'message' => 'Mật khẩu không chính xác!!!',
                 ], 400);
-
             } else {
                 return response()->json([
                     'errors' => [

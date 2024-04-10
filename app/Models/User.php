@@ -49,6 +49,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'otp_expire_date' => 'datetime',
     ];
 
     public function getSlugOptions(): SlugOptions
