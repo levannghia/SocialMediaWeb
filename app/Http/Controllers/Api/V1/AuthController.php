@@ -210,7 +210,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $user = User::where('email', $request->input('data'))->first();
+            $user = User::where('email', $request->input('email'))->first();
             $user->tokens()->delete();
             
             return response()->json('User logged out!', 200);
