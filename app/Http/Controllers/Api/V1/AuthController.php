@@ -197,6 +197,34 @@ class AuthController extends Controller
         }
     }
 
+    public function forgotPassword(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "email" => ["email", "required"],
+        ]);
+
+        try {
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors(),
+                    'message' => 'Forgot Password Fails!!!'
+                ], 422);
+            }
+
+            $user = User::where('email', $request->input('email'))->first();
+            //TODO...
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Forgot Password error!'
+            ], 500);
+        }
+    }
+
+    public function loginWithGoogle(Request $request) {
+        
+    }
+
     public function logout(Request $request){
         $validator = Validator::make($request->all(), [
             "email" => ["email", "required"],
