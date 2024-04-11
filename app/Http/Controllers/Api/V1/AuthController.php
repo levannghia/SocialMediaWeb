@@ -222,7 +222,13 @@ class AuthController extends Controller
     }
 
     public function loginWithGoogle(Request $request) {
-        
+        $user = User::where('email', $request->input('email'))->exists();
+
+        if($user){
+
+        }else{
+            
+        }
     }
 
     public function logout(Request $request){
