@@ -69,6 +69,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
     }
+
+    public function socialProvider() {
+        return $this->hasOne(SocialProvider::class);
+    }
     // public function getRouteKeyName(): string
     // {
     //     return 'username';

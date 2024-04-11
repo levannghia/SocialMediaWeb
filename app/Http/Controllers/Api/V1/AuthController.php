@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Models\SocialProvider;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -128,7 +129,7 @@ class AuthController extends Controller
                 $user->otp_expire_date = Carbon::now()->addMinutes($this->minute);
 
                 $user->save();
-                
+
                 $user->notify(new VerificationEmail($otp, $this->minute));
 
                 return response()->json([
@@ -197,7 +198,8 @@ class AuthController extends Controller
         }
     }
 
-    public function forgotPassword(Request $request) {
+    public function forgotPassword(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             "email" => ["email", "required"],
         ]);
@@ -221,22 +223,84 @@ class AuthController extends Controller
         }
     }
 
-    public function loginWithGoogle(Request $request) {
-        $user = User::where('email', $request->input('email'))->exists();
+    public function loginWithGoogle(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            "name" => ["required", "string"],
+            "email" => ["email", "required"],
+            "photo" => ["string", "nullable"],
+            "provider" => ["required", "string"],
+            "id" => ["required", "string"],
+        ]);
 
-        if($user){
+        try {
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => $validator->errors(),
+                    'message' => 'Login with google Fails!!!'
+                ], 422);
+            }
+            $user = User::where('email', $request->input('email'))->first();
 
-        }else{
-            
+            if ($user) {
+                $user->name = $request->input('name');
+                if ($user->email_verified_at === null) {
+                    $user->email_verified_at = Carbon::now();
+                }
+                $user->avatar_path = $request->input('photo');
+                $user->save();
+
+                if (!$user->socialProvider()->exists()) {
+                    $socical = new SocialProvider;
+                    $socical->user_id = $user->id;
+                    $socical->provider_id = $request->input('id');
+                    $socical->provider = $request->input('provider');
+                    $socical->save();
+                }
+
+                $token = $user->createToken('user_token_google')->plainTextToken;
+
+                return response()->json([
+                    'data' => new UserResource($user),
+                    'token' => $token,
+                    'message' => 'Đăng nhập google thành công!'
+                ], 200);
+            } else {
+                $newUser = User::create([
+                    "name" => $request->input('name'),
+                    "email" => $request->input('email'),
+                    "avatar_path" => $request->input('photo'),
+                    "email_verified_at" => Carbon::now(),
+                ]);
+                $socical = new SocialProvider([
+                    'provider_id' => $request->input('id'),
+                    'provider' => $request->input('provider'),
+                ]);
+
+                $newUser->socialProvider()->save($socical);
+                $newToken = $newUser->createToken('user_token_google')->plainTextToken;
+                return response()->json([
+                    'data' => new UserResource($newUser),
+                    'token' => $newToken,
+                    'message' => 'Đăng nhập google thành công!'
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Login With Google Fails!'
+            ], 500);
         }
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             "email" => ["email", "required"],
         ]);
 
-        try {   
+        try {
             if ($validator->fails()) {
                 return response()->json([
                     'errors' => $validator->errors(),
@@ -246,7 +310,7 @@ class AuthController extends Controller
 
             $user = User::where('email', $request->input('email'))->first();
             $user->tokens()->delete();
-            
+
             return response()->json('User logged out!', 200);
         } catch (\Exception $e) {
             Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());

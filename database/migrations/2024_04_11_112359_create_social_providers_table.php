@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('social_providers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
-            $table->string('token', 2000)->nullable();
+            $table->string('provider_id')->nullable();
             $table->string('provider');
         });
     }
