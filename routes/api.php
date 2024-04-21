@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,9 @@ Route::prefix('auth')->name('api.auth.')->group(function(){
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
+    Route::prefix('user')->name('user.')->group(function() {
+        Route::get('/list-user', [UserController::class, 'getAllUser'])->name('listUser');
+    });
 });
 
 Route::get('/test', function (){
