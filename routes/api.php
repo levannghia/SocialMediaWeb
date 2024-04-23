@@ -20,6 +20,34 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+Route::post('/update-file-demo', function (Request $request) {
+    // Kiểm tra xem request có chứa file không
+if ($request->hasFile('image')) {
+    $file = $request->file('image');
+
+    // Kiểm tra xem file có lỗi không
+    if ($file->isValid()) {
+        // Lưu file vào thư mục 'test-demo' trong thư mục 'public'
+        $path = $file->store('test-demo', 'public');
+
+        return response()->json([
+            'path' => $path,
+        ], 200);
+    } else {
+        // Xử lý lỗi nếu file không hợp lệ
+        return response()->json([
+            'error' => 'Invalid file.',
+        ], 400);
+    }
+} else {
+    // Xử lý trường hợp không có file được tải lên
+    return response()->json([
+        'error' => 'No file uploaded.',
+    ], 400);
+}
+});
+
 Route::prefix('auth')->name('api.auth.')->group(function(){
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login', [AuthController::class, 'login'])->name('login');
