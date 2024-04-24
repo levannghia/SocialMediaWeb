@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
@@ -63,6 +64,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/list-user', [UserController::class, 'getAllUser'])->name('listUser');
+    });
+    Route::prefix('category')->name('category.')->group(function () {
+        Route::get('/list-category', [CategoryController::class, 'getAllCategory'])->name('listCategory');
     });
     Route::prefix('event')->name('event.')->group(function () {
         Route::post('/store', [EventController::class, 'store'])->name('store');

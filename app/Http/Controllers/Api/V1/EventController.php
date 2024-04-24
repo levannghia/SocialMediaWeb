@@ -31,9 +31,9 @@ class EventController extends Controller
             'position' => ['required', 'array'],
             'fileType' => ['required', Rule::enum(EventUserStatus::class)],
             'fileUrl' => ['string', 'nullable'],
-            'startAt' => ['required', 'string'],
-            'endAt' => ['required', 'string'],
-            'date' => ['required', 'string'],
+            'startAt' => ['required'],
+            'endAt' => ['required'],
+            'date' => ['required'],
             'price' => ['nullable', 'numeric'],
             'image' => [
                 'file',
@@ -103,7 +103,9 @@ class EventController extends Controller
                 'data' => new EventResource($event),
             ], 201);
         } catch (\Exception $e) {
-            Storage::disk('public')->delete($path);
+            if($data['fileType'] == 'file'){
+                Storage::disk('public')->delete($path);
+            }
             Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
             DB::rollBack();
             return response()->json([
