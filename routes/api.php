@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -63,7 +64,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/list-user', [UserController::class, 'getAllUser'])->name('listUser');
     });
+    Route::prefix('event')->name('event.')->group(function () {
+        Route::post('/store', [EventController::class, 'store'])->name('store');
+    });
 });
+
+
 
 Route::get('/test', function () {
     return response()->json([

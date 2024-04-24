@@ -12,6 +12,15 @@ class Category extends Model
 {
     use HasFactory, SoftDeletes, HasSlug;
 
+    protected $fillable = [
+        'name',
+        'slug',
+        'icon',
+        'color',
+        'parent_id',
+        'status',
+    ];
+
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
