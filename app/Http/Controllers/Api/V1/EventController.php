@@ -161,7 +161,7 @@ class EventController extends Controller
         }
 
         $distance = $data['distance'] ?? 20;
-        $limit = $data['limit'] ?? 50;
+        $limit = isset($data['limit']) ? $data['limit'] : 0;
 
         try {
             $newEvents = [];
