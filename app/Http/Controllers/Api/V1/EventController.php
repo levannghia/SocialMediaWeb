@@ -170,7 +170,7 @@ class EventController extends Controller
             })->get();
 
             if (isset($data['lat']) && isset($data['long'])) {
-                foreach ($events as $key => $event) {
+                foreach ($events as $event) {
                     $eventDistance = $this->calcDistanceLocation($data['lat'], $data['long'], $event->position['lat'], $event->position['long']);
 
                     if ($eventDistance < $distance) {
@@ -183,7 +183,7 @@ class EventController extends Controller
                 ], 200);
             }
             return response()->json([
-                'data' => EventResource::collection($events),
+                'data' => EventResource::collection($events)
             ], 200);
         } catch (\Exception $e) {
             Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
