@@ -26,6 +26,7 @@ class EventResource extends JsonResource
             'user' => new UserResource($this->user),
             'category' => new CategoryResource($this->category),
             'position' => $this->position,
+            'fileType' => $this->file_type,
             'fileUrl' => $this->path ? Storage::url($this->path) : null,
             'startAt' => $this->start_at,
             'endAt' => $this->end_at,

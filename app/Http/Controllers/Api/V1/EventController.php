@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
+use phpDocumentor\Reflection\Types\This;
 
 class EventController extends Controller
 {
@@ -103,11 +104,89 @@ class EventController extends Controller
                 'data' => new EventResource($event),
             ], 201);
         } catch (\Exception $e) {
-            if($data['fileType'] == 'file'){
+            if ($data['fileType'] == 'file') {
                 Storage::disk('public')->delete($path);
             }
             Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
             DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Store Event error!'
+            ], 500);
+        }
+    }
+
+
+    private function calcDistanceLocation($currentLat, $currentLong, $addressLat, $addressLong)
+    {
+        $r = 6371; // Bán kính trái đất ở đơn vị kilomet (km)
+
+        // Chuyển đổi độ sang radian
+        $dLat = $this->toRad($addressLat - $currentLat);
+        $dLon = $this->toRad($addressLong - $currentLong);
+
+        // Tính biến a theo công thức haversine
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            sin($dLon / 2) * sin($dLon / 2) *
+            cos($this->toRad($currentLat)) * cos($this->toRad($addressLat));
+
+        // Tính khoảng cách
+        $distance = $r * (2 * atan2(sqrt($a), sqrt(1 - $a)));
+
+        return $distance;
+    }
+
+    private function toRad($val)
+    {
+        return $val * pi() / 180;
+    }
+
+
+    public function getEventNearByCurrentLocation(Request $request)
+    {
+        $data = $request->all();
+        $validator = Validator::make($data, [
+            'lat' => ['numeric', 'nullable'],
+            'long' => ['numeric', 'nullable'],
+            'distance' => ['nullable', 'numeric'],
+            'limit' => ['nullable', 'numeric'],
+            'date' => ['nullable', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'message' => 'Validation get event near by current location fail!!!'
+            ], 422);
+        }
+
+        $distance = $data['distance'] ?? 20;
+        $limit = $data['limit'] ?? 50;
+
+        try {
+            $newEvents = [];
+            $events = Event::when($limit, function ($query, $limit) {
+                $query->limit($limit);
+            })->get();
+
+            if (isset($data['lat']) && isset($data['long'])) {
+                foreach ($events as $key => $event) {
+                    $eventDistance = $this->calcDistanceLocation($data['lat'], $data['long'], $event->position['lat'], $event->position['long']);
+
+                    if ($eventDistance < $distance) {
+                        array_push($newEvents, $event);
+                    }
+                }
+
+                return response()->json([
+                    'data' => EventResource::collection($newEvents),
+                ], 200);
+            }
+            return response()->json([
+                'data' => EventResource::collection($events),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
             return response()->json([
                 'error' => $e->getMessage(),
                 'message' => 'Store Event error!'
