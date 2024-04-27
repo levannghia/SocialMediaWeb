@@ -142,7 +142,7 @@ class EventController extends Controller
     }
 
 
-    public function getEventNearByCurrentLocation(Request $request)
+    public function getEvent(Request $request)
     {
         $data = $request->all();
         $validator = Validator::make($data, [
@@ -150,7 +150,7 @@ class EventController extends Controller
             'long' => ['numeric', 'nullable'],
             'distance' => ['nullable', 'numeric'],
             'limit' => ['nullable', 'numeric'],
-            'date' => ['nullable', 'string'],
+            'date' => ['nullable'],
         ]);
 
         if ($validator->fails()) {
@@ -162,12 +162,16 @@ class EventController extends Controller
 
         $distance = $data['distance'] ?? 20;
         $limit = isset($data['limit']) ? $data['limit'] : 0;
-
+        $date = isset($data['date']) ? $data['date'] : null;
         try {
             $newEvents = [];
             $events = Event::when($limit, function ($query, $limit) {
                 $query->limit($limit);
-            })->get();
+            })
+            ->when($date, function($query, $date) {
+                $query->whereDate('date', '>=', $date);
+            })
+            ->orderBy('date', 'ASC')->get();
 
             if (isset($data['lat']) && isset($data['long'])) {
                 foreach ($events as $event) {
@@ -189,7 +193,7 @@ class EventController extends Controller
             Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
             return response()->json([
                 'error' => $e->getMessage(),
-                'message' => 'Store Event error!'
+                'message' => 'Get Event error!'
             ], 500);
         }
     }

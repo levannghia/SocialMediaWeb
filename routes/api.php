@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::prefix('event')->name('event.')->group(function () {
         Route::post('/store', [EventController::class, 'store'])->name('store');
-        Route::get('/near-by-current-location', [EventController::class, 'getEventNearByCurrentLocation'])->name('eventNearByCurrentLocation');
+        Route::get('/get-event', [EventController::class, 'getEvent'])->name('index');
     });
 });
 
