@@ -67,4 +67,9 @@ class Event extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function followings()
+    {
+        return $this->belongsToMany(User::class, 'follower_events', 'event_id', 'user_id');
+    }
 }

@@ -69,8 +69,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/list-category', [CategoryController::class, 'getAllCategory'])->name('listCategory');
     });
     Route::prefix('event')->name('event.')->group(function () {
+        Route::get('/event-detail', [EventController::class, 'getEventById'])->name('detail');
         Route::post('/store', [EventController::class, 'store'])->name('store');
         Route::get('/get-event', [EventController::class, 'getEvent'])->name('index');
+        Route::post('/follower', [EventController::class, 'followEvent'])->name('follower');
     });
 });
 

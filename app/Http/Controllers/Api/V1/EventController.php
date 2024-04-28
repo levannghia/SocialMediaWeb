@@ -8,6 +8,7 @@ use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
+use App\Models\FollowerEvent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -165,7 +166,7 @@ class EventController extends Controller
         $date = isset($data['date']) ? $data['date'] : null;
         try {
             $newEvents = [];
-            $events = Event::with(['approvedUsers'])
+            $events = Event::with(['approvedUsers', 'followings'])
             ->when($limit, function ($query, $limit) {
                 $query->limit($limit);
             })
@@ -195,6 +196,73 @@ class EventController extends Controller
             return response()->json([
                 'error' => $e->getMessage(),
                 'message' => 'Get Event error!'
+            ], 500);
+        }
+    }
+
+    public function getEventById(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'id' => ['numeric', 'required', 'exists:events,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'message' => 'Validation get event by ID fail!!!'
+            ], 422);
+        }
+
+        $event = Event::where('id', $request->input('id'))->with(['approvedUsers', 'followings'])->first();
+
+        if($event) {
+            return response()->json([
+                'data' => new EventResource($event)
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'Event không tồn tại!'
+        ], 500);
+    }
+
+    public function followEvent(Request $request) {
+
+        $validator = Validator::make($request->all(), [
+            'follow' => ['boolean'],
+            'eventId' => ['required', 'numeric', 'exists:events,id']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'message' => 'Validation follow event fail!!!'
+            ], 422);
+        }
+
+        $user = auth()->user();
+        try {
+            if ($request->input('follow')) {
+                $message = 'You followed success!';
+                FollowerEvent::create([
+                    'user_id' => $user->id,
+                    'event_id' => $request->input('eventId'),
+                ]);
+            } else {
+                $message = 'You unfollowed success!';
+                FollowerEvent::query()
+                    ->where('user_id', $user->id)
+                    ->where('event_id', $request->input('eventId'))
+                    ->delete();
+            }
+    
+            return response()->json([
+                'message' => $message
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Follow Event error!'
             ], 500);
         }
     }

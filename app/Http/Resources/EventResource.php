@@ -32,6 +32,7 @@ class EventResource extends JsonResource
             'date' => $this->date,
             'price' => $this->price,
             'users' => UserResource::collection($this->whenLoaded('approvedUsers')),
+            'followers' => UserResource::collection($this->whenLoaded('followings'))
         ];
     }
 }
