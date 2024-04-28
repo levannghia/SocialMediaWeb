@@ -31,7 +31,7 @@ class EventResource extends JsonResource
             'endAt' => $this->end_at,
             'date' => $this->date,
             'price' => $this->price,
-            'users' => UserResource::collection($this->whenLoaded('events')),
+            'users' => UserResource::collection($this->whenLoaded('approvedUsers')),
         ];
     }
 }

@@ -165,7 +165,8 @@ class EventController extends Controller
         $date = isset($data['date']) ? $data['date'] : null;
         try {
             $newEvents = [];
-            $events = Event::when($limit, function ($query, $limit) {
+            $events = Event::with(['approvedUsers'])
+            ->when($limit, function ($query, $limit) {
                 $query->limit($limit);
             })
             ->when($date, function($query, $date) {
