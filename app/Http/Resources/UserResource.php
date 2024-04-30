@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             "avatar_url" => $this->avatar_path != null ? Storage::url($this->avatar_path) : '/images/user_default.png',
             "pinned_post_id" => $this->pinned_post_id,
             "email_verified_at" => $this->email_verified_at,
+            "fcm_tokens" => $this->fcm_tokens ?? [],
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at
         ];

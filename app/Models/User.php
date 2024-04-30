@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'otp',
         'otp_expire_date',
         'pinned_post_id',
+        'fcm_tokens'
     ];
 
     /**
@@ -50,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'otp_expire_date' => 'datetime',
+        'fcm_tokens' => 'array',
     ];
 
     public function getSlugOptions(): SlugOptions
