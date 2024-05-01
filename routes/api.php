@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\EventController;
+use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -50,6 +51,8 @@ Route::post('/update-file-demo', function (Request $request) {
         ], 400);
     }
 });
+
+Route::post('/send-notification', [NotificationController::class, 'handleSendNotification'])->name('send.notification');
 
 Route::prefix('auth')->name('api.auth.')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
