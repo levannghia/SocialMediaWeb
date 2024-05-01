@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -32,5 +33,29 @@ class UserController extends Controller
                 'message' => 'Logout error!',
             ], 500);
         }
+    }
+
+    public function updateFcmToken(Request $request){
+        $validator = Validator::make($request->all(), [
+            "fcmToken" => ["array", "nullable"],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors(),
+                'message' => 'Validate update FCM Token Fails!!!'
+            ], 422);
+        }
+
+        $user = auth()->user();
+
+        if($user){
+            $user->fcm_tokens = $request->input('fcmToken');
+            $user->save();
+
+            return response()->json([
+                'data' => new UserResource($user),
+            ], 201);
+        } 
     }
 }

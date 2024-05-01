@@ -64,6 +64,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('api.auth.logout');
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/list-user', [UserController::class, 'getAllUser'])->name('listUser');
+        Route::put('/update-fcm-token', [UserController::class, 'updateFcmToken'])->name('updateFcmToken');
     });
     Route::prefix('category')->name('category.')->group(function () {
         Route::get('/list-category', [CategoryController::class, 'getAllCategory'])->name('listCategory');
