@@ -41,7 +41,9 @@ class UserController extends Controller
             $user = User::where('id', $id)->first();
             if ($user) {
                 return response()->json([
-                    'data' => new UserResource($user),
+                    'user' => new UserResource($user),
+                    'followings' => UserResource::collection($user->followings),
+                    'followers' => UserResource::collection($user->followers),
                 ], 200);
             }
             return response()->json([
