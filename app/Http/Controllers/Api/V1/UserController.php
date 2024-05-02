@@ -35,7 +35,29 @@ class UserController extends Controller
         }
     }
 
-    public function updateFcmToken(Request $request){
+    public function getProfile($id)
+    {
+        try {
+            $user = User::where('id', $id)->first();
+            if ($user) {
+                return response()->json([
+                    'data' => new UserResource($user),
+                ], 200);
+            }
+            return response()->json([
+                'message' => 'Profile khong ton tai!',
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Get profile error!',
+            ], 500);
+        }
+    }
+
+    public function updateFcmToken(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             "fcmToken" => ["array", "nullable"],
         ]);
@@ -49,13 +71,13 @@ class UserController extends Controller
 
         $user = auth()->user();
 
-        if($user){
+        if ($user) {
             $user->fcm_tokens = $request->input('fcmToken');
             $user->save();
 
             return response()->json([
                 'data' => new UserResource($user),
             ], 201);
-        } 
+        }
     }
 }
