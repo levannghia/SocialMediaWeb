@@ -60,7 +60,6 @@ class ProfileController extends Controller
             'success' => session('success'),
             'user' => new UserResource($user),
         ]);
-        ;
     }
 
     public function edit(Request $request): Response

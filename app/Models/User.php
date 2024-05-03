@@ -27,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'cover_path',
         'avatar_path',
         'otp',
+        'file_type',
         'otp_expire_date',
         'pinned_post_id',
         'fcm_tokens'

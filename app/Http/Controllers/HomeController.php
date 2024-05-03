@@ -9,12 +9,14 @@ use App\Http\Resources\UserResource;
 use App\Models\Group;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class HomeController extends Controller
 {
     public function index(Request $request)
     {
+        // dd(Auth::guest());
         $user_id = auth()->id();
         $user = $request->user();
         $query = Post::postsForTimeLine($user_id)
