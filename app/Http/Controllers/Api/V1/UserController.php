@@ -69,7 +69,8 @@ class UserController extends Controller
         }
     }
 
-    public function followUser(Request $request) {
+    public function followUser(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'follow' => ['boolean'],
             'id' => ['exists:users,id', 'numeric']
@@ -84,14 +85,16 @@ class UserController extends Controller
 
         $user = User::where('id', $request->input('id'))->first();
 
-        if ($request->input('follow')) {
-            $message = 'You followed user "'.$user->name.'"';
+        if (!$request->input('follow')) {
+            $message = 'You followed user "' . $user->name . '"';
+            $follow = true;
             Follower::create([
                 'user_id' => $user->id,
                 'follower_id' => auth()->id(),
             ]);
         } else {
-            $message = 'You unfollowed user "'.$user->name.'"';
+            $message = 'You unfollowed user "' . $user->name . '"';
+            $follow = false;
             Follower::query()
                 ->where('user_id', $user->id)
                 ->where('follower_id', auth()->id())
@@ -99,6 +102,9 @@ class UserController extends Controller
         }
 
         return response()->json([
+            'follow' => $follow,
+            'followings' => UserResource::collection($user->followings),
+            'followers' => UserResource::collection($user->followers),
             'message' => $message,
         ], 200);
     }

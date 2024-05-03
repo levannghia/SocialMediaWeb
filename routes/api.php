@@ -70,7 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile/{id}', [UserController::class, 'getProfile'])->name('profile');
         Route::put('/update-fcm-token', [UserController::class, 'updateFcmToken'])->name('updateFcmToken');
         Route::put('/update', [UserController::class, 'update'])->name('update');
-        Route::post('/follower', [UserController::class, 'followUser'])->name('follow');
+        Route::post('/follower', [UserController::class, 'followUser'])->name('follower');
     });
     Route::prefix('category')->name('category.')->group(function () {
         Route::get('/list-category', [CategoryController::class, 'getAllCategory'])->name('listCategory');
