@@ -8,16 +8,17 @@ use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\StoreEventRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
+use App\Models\Follower;
 use App\Models\FollowerEvent;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\File;
-use phpDocumentor\Reflection\Types\This;
 
 class EventController extends Controller
 {
@@ -167,13 +168,13 @@ class EventController extends Controller
         try {
             $newEvents = [];
             $events = Event::with(['approvedUsers', 'followings'])
-            ->when($limit, function ($query, $limit) {
-                $query->limit($limit);
-            })
-            ->when($date, function($query, $date) {
-                $query->whereDate('date', '>=', $date);
-            })
-            ->orderBy('date', 'ASC')->get();
+                ->when($limit, function ($query, $limit) {
+                    $query->limit($limit);
+                })
+                ->when($date, function ($query, $date) {
+                    $query->whereDate('date', '>=', $date);
+                })
+                ->orderBy('date', 'ASC')->get();
 
             if (isset($data['lat']) && isset($data['long'])) {
                 foreach ($events as $event) {
@@ -200,7 +201,8 @@ class EventController extends Controller
         }
     }
 
-    public function getEventById(Request $request) {
+    public function getEventById(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'id' => ['numeric', 'required', 'exists:events,id'],
         ]);
@@ -213,9 +215,15 @@ class EventController extends Controller
         }
 
         $event = Event::where('id', $request->input('id'))->with(['approvedUsers', 'followings'])->first();
+        $user = $event->user;
+        $isCurrentUserFollower = false;
+        if (!Auth::guest()) {
+            $isCurrentUserFollower = Follower::where('user_id', $user->id)->where('follower_id', auth()->id())->exists();
+        }
 
-        if($event) {
+        if ($event) {
             return response()->json([
+                'follow' => $isCurrentUserFollower,
                 'data' => new EventResource($event)
             ], 200);
         }
@@ -225,7 +233,8 @@ class EventController extends Controller
         ], 500);
     }
 
-    public function followEvent(Request $request) {
+    public function followEvent(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'follow' => ['boolean'],
@@ -254,7 +263,7 @@ class EventController extends Controller
                     ->where('event_id', $request->input('eventId'))
                     ->delete();
             }
-    
+
             return response()->json([
                 'message' => $message
             ], 201);
