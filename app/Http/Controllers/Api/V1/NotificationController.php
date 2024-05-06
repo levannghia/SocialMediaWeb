@@ -37,7 +37,7 @@ class NotificationController extends Controller
             "title" => ["string", "nullable"],
             "body" => ["string", "nullable"],
             "subtitle" => ["string", "nullable"],
-            "fcmTokens" => ["required"],
+            "fcmTokens" => ["required", "string"],
         ]);
 
         if ($validator->fails()) {
@@ -46,7 +46,7 @@ class NotificationController extends Controller
                 'message' => 'Validation send notification fail!!!'
             ], 422);
         }
-        
+
         $token = 'AAAA29q30NE:APA91bHxrWGXNWsrtVVu6eVit85U7a62frJaiKO7og_TYdBWWmyUTHKq-X1zIC7A7aKbyJ1a_opPU2Hsj3K-wau5XZdepKW7jcdBKBRexJeuUPLOj1m6D7obcSH7YThL5l8vry0zsZ5s';
         $accessToken = $this->getAccessToken();
 
@@ -55,13 +55,14 @@ class NotificationController extends Controller
                 "message" => [
                     // 'registration_ids' => $request->input('fcmTokens'),
                     "token" => $request->input('fcmTokens'),
-                    'notification' => [
+                    "notification" => [
+                        // "topic" => "news",
                         "title" => $request->input('title') ?? '',
                         "body" => $request->input('body') ?? '',
                         "subtitle" => $request->input('subtitle') ?? '',
-                        "sound" => "default"
+                        // "sound" => "default"
                     ],
-                    'data' => [
+                    "data" => [
                         'id' => 12
                     ]
                 ]
