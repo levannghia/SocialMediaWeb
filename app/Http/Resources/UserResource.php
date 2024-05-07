@@ -16,6 +16,11 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user(); // Lấy thông tin người dùng từ request
+
+        // Kiểm tra xem người dùng đã đăng nhập và có phải là chủ sở hữu của tài nguyên không
+        $isOwner = $user && $user->id === $this->user_id;
+
         return [
             "id" => $this->id,
             "name" => $this->name,
@@ -25,7 +30,7 @@ class UserResource extends JsonResource
             "avatar_url" => $this->avatar_path != null ? Storage::url($this->avatar_path) : '/images/user_default.png',
             "pinned_post_id" => $this->pinned_post_id,
             "email_verified_at" => $this->email_verified_at,
-            "fcm_tokens" => $this->fcm_tokens ?? [],
+            "fcm_tokens" => $isOwner ? $this->fcm_tokens ?? [] : null,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at
         ];

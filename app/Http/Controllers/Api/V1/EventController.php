@@ -151,7 +151,7 @@ class EventController extends Controller
             'lat' => ['numeric', 'nullable'],
             'long' => ['numeric', 'nullable'],
             'distance' => ['nullable', 'numeric'],
-            'limit' => ['nullable', 'numeric'],
+            // 'limit' => ['nullable', 'numeric'],
             'date' => ['nullable'],
             'perpage' => ['nullable', 'numeric'],
         ]);
@@ -164,19 +164,20 @@ class EventController extends Controller
         }
 
         $distance = $data['distance'] ?? 20;
-        $limit = isset($data['limit']) ? $data['limit'] : 0;
+        // $limit = isset($data['limit']) ? $data['limit'] : 0;
         $date = isset($data['date']) ? $data['date'] : null;
         $perPage = isset($data['perpage']) ? $data['perpage'] : 15;
         try {
             $newEvents = [];
             $events = Event::with(['approvedUsers', 'followings'])
-                ->when($limit, function ($query, $limit) {
-                    $query->limit($limit);
-                })
+                // ->when($limit, function ($query, $limit) {
+                //     $query->limit($limit);
+                // })
                 ->when($date, function ($query, $date) {
                     $query->whereDate('date', '>=', $date);
                 })
-                ->orderBy('date', 'ASC')->paginate($perPage);
+                ->orderBy('date', 'ASC')
+                ->paginate($perPage);
 
             if (isset($data['lat']) && isset($data['long'])) {
                 foreach ($events as $event) {
@@ -189,6 +190,21 @@ class EventController extends Controller
 
                 return response()->json([
                     'data' => EventResource::collection($newEvents),
+                    'links' => [
+                        'first' => $events->url(1),
+                        'last' => $events->url($events->lastPage()),
+                        'prev' => $events->previousPageUrl(),
+                        'next' => $events->nextPageUrl(),
+                    ],
+                    'meta' => [
+                        'current_page' => $events->currentPage(),
+                        'from' => $events->firstItem(),
+                        'last_page' => $events->lastPage(),
+                        'path' => $events->path(),
+                        'per_page' => $events->perPage(),
+                        'to' => $events->lastItem(),
+                        'total' => $events->total(),
+                    ],
                 ], 200);
             }
             return response()->json([
