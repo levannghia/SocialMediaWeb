@@ -153,6 +153,7 @@ class EventController extends Controller
             'distance' => ['nullable', 'numeric'],
             'limit' => ['nullable', 'numeric'],
             'date' => ['nullable'],
+            'perpage' => ['nullable', 'numeric'],
         ]);
 
         if ($validator->fails()) {
@@ -165,6 +166,7 @@ class EventController extends Controller
         $distance = $data['distance'] ?? 20;
         $limit = isset($data['limit']) ? $data['limit'] : 0;
         $date = isset($data['date']) ? $data['date'] : null;
+        $perPage = isset($data['perpage']) ? $data['perpage'] : 15;
         try {
             $newEvents = [];
             $events = Event::with(['approvedUsers', 'followings'])
@@ -174,7 +176,7 @@ class EventController extends Controller
                 ->when($date, function ($query, $date) {
                     $query->whereDate('date', '>=', $date);
                 })
-                ->orderBy('date', 'ASC')->get();
+                ->orderBy('date', 'ASC')->paginate($perPage);
 
             if (isset($data['lat']) && isset($data['long'])) {
                 foreach ($events as $event) {
