@@ -26,4 +26,20 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
+    public function getCategoryById($id){
+        try {
+            $category = Category::find($id);
+
+            return response()->json([
+                'data' => new CategoryResource($category),
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'get category by id error!',
+            ], 500);
+        }
+    }
 }

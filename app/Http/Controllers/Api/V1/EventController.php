@@ -154,6 +154,7 @@ class EventController extends Controller
             'search' => ['nullable', 'string'],
             'date' => ['nullable'],
             'perpage' => ['nullable', 'numeric'],
+            'categoryid' => ['nullable', 'numeric', 'exists:categories,id']
         ]);
 
         if ($validator->fails()) {
@@ -168,6 +169,8 @@ class EventController extends Controller
         $date = isset($data['date']) ? $data['date'] : null;
         $perPage = isset($data['perpage']) ? $data['perpage'] : 15;
         $search = $request->input('search');
+        $categoryId = $request->input('categoryid');
+
         try {
             $newEvents = [];
             $query = Event::with(['approvedUsers', 'followings'])
@@ -181,6 +184,10 @@ class EventController extends Controller
                 
             if($search){
                 $query->where('title', 'like', "%$search%");
+            }
+
+            if($categoryId) {
+                $query->where('category_id', $categoryId);
             }
 
             $events = $query->paginate($perPage);

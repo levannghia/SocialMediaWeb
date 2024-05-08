@@ -73,7 +73,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/follower', [UserController::class, 'followUser'])->name('follower');
     });
     Route::prefix('category')->name('category.')->group(function () {
-        Route::get('/list-category', [CategoryController::class, 'getAllCategory'])->name('listCategory');
+        Route::get('/list-category', [CategoryController::class, 'getAllCategory'])->name('list');
+        Route::get('/category-detail/{id}', [CategoryController::class, 'getCategoryById'])->name('detail');
     });
     Route::prefix('event')->name('event.')->group(function () {
         Route::get('/event-detail', [EventController::class, 'getEventById'])->name('detail');
