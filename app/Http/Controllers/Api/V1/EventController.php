@@ -151,7 +151,7 @@ class EventController extends Controller
             'lat' => ['numeric', 'nullable'],
             'long' => ['numeric', 'nullable'],
             'distance' => ['nullable', 'numeric'],
-            // 'limit' => ['nullable', 'numeric'],
+            'search' => ['nullable', 'string'],
             'date' => ['nullable'],
             'perpage' => ['nullable', 'numeric'],
         ]);
@@ -167,18 +167,24 @@ class EventController extends Controller
         // $limit = isset($data['limit']) ? $data['limit'] : 0;
         $date = isset($data['date']) ? $data['date'] : null;
         $perPage = isset($data['perpage']) ? $data['perpage'] : 15;
+        $search = $request->input('search');
         try {
             $newEvents = [];
-            $events = Event::with(['approvedUsers', 'followings'])
+            $query = Event::with(['approvedUsers', 'followings'])
                 // ->when($limit, function ($query, $limit) {
                 //     $query->limit($limit);
                 // })
                 ->when($date, function ($query, $date) {
                     $query->whereDate('date', '>=', $date);
                 })
-                ->orderBy('date', 'ASC')
-                ->paginate($perPage);
+                ->orderBy('date', 'ASC');
+                
+            if($search){
+                $query->where('title', 'like', "%$search%");
+            }
 
+            $events = $query->paginate($perPage);
+ 
             if (isset($data['lat']) && isset($data['long'])) {
                 foreach ($events as $event) {
                     $eventDistance = $this->calcDistanceLocation($data['lat'], $data['long'], $event->position['lat'], $event->position['long']);
