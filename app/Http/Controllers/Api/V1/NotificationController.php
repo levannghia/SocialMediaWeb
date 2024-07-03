@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\EventUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -125,5 +126,34 @@ class NotificationController extends Controller
                 'message' => 'Validation send notification fail!!!'
             ], 422);
         }
+    }
+
+    public function joinEvent(Request $request)
+    {
+        $data = $request->validate([
+            'event_id' => ['required', 'numeric'],
+            'user_id' => ['required', 'numeric'],
+            'from_id' => ['required', 'numeric'],
+            'status' => ['required'],
+        ]);
+
+        $eventUser = EventUser::where('event_id', $data['event_id'])
+        ->where('user_id', $data['user_id'])
+        ->where('created_by', $data['from_id'])->first();
+
+        if($eventUser) {
+            $eventUser->status = $data['status'];
+            $eventUser->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Join event success!',
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Join Event that bai!',
+        ], 500);
     }
 }

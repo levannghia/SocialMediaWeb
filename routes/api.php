@@ -85,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::prefix('notification')->name('notification.')->group(function() {
         Route::post('/invite-users-event', [NotificationController::class, 'handleSendInviteNotification'])->name('send.invite.notification');
+        Route::post('/join-event', [NotificationController::class, 'joinEvent'])->name('join.event');
     });
 });
 
