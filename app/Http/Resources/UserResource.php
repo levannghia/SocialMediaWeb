@@ -19,7 +19,7 @@ class UserResource extends JsonResource
         $user = $request->user(); // Lấy thông tin người dùng từ request
 
         // Kiểm tra xem người dùng đã đăng nhập và có phải là chủ sở hữu của tài nguyên không
-        $isOwner = $user && $user->id === $this->user_id;
+        $isOwner = $user && $user->id === $this->id;
 
         return [
             "id" => $this->id,

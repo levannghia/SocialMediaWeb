@@ -84,6 +84,45 @@ class NotificationController extends Controller
         }
     }
 
+    public function handleSendNotificationEvent($fcmToken, $title, $body, $data = [])
+    {
+
+        $accessToken = $this->getAccessToken();
+
+        try {
+            $response = Http::withToken($accessToken)->acceptJson()->post('https://fcm.googleapis.com/v1/projects/eventhub-4c23c/messages:send', [
+                "message" => [
+                    "token" => $fcmToken,
+                    "notification" => [
+                        "title" => $title ?? '',
+                        "body" => $body ?? '',
+                    ],
+                    "data" => $data,
+                ]
+            ]);
+
+            if ($response->failed()) {
+                $error = $response->json('error');
+                Log::error("Lỗi FCM: " . $error['message']);
+                return response()->json([
+                    'error' => $error['message'],
+                    'message' => 'Gửi thông báo thất bại!',
+                ], 500);
+            }
+
+            return response()->json([
+                'message' => 'Send notification success!',
+                'data' => $response,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("message: " . $e->getMessage() . ' ---- line: ' . $e->getLine());
+            return response()->json([
+                'error' => $e->getMessage(),
+                'message' => 'Send notification error!',
+            ], 500);
+        }
+    }
+
     public function sendNotification($title, $body, $fcmToken, $data = [])
     {
         $accessToken = $this->getAccessToken();
@@ -141,6 +180,7 @@ class NotificationController extends Controller
 
         $event = Event::find($data['event_id']);
         $user = User::find($data['user_id']);
+        $fromUser = User::find($data['from_id']);
 
         if($event) {
             EventUser::create([
@@ -151,8 +191,15 @@ class NotificationController extends Controller
                 'created_by' => $event->user_id,
             ]);
 
-            if(count($user->fcm_tokens) > 0){
+            $title = $fromUser->name . ' mời bạn tham gia event';
+            $body = 'Bạn nhận được lời mời tham gia sự kiên ' . $event->title;
 
+            if($user->fcm_tokens){
+                foreach ($user->fcm_tokens as $token) { 
+                    $this->handleSendNotificationEvent($token, $title, $body, [
+                        'id' => '12',
+                    ]);
+                }
             } else {
                 $user->notify(new InvitationEvent($event, $user));
             }

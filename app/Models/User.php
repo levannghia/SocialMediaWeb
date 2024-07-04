@@ -52,7 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
         'otp_expire_date' => 'datetime',
-        'fcm_tokens' => 'array',
+        'fcm_tokens' => 'json',
     ];
 
     public function getSlugOptions(): SlugOptions

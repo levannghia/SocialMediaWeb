@@ -68,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/list-user', [UserController::class, 'getAllUser'])->name('listUser');
         Route::get('/profile/{id}', [UserController::class, 'getProfile'])->name('profile');
-        Route::put('/update-fcm-token', [UserController::class, 'updateFcmToken'])->name('updateFcmToken');
+        Route::post('/update-fcm-token', [UserController::class, 'updateFcmToken'])->name('updateFcmToken');
         Route::put('/update', [UserController::class, 'update'])->name('update');
         Route::post('/follower', [UserController::class, 'followUser'])->name('follower');
     });
