@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Models\EventUser;
+use App\Models\User;
+use App\Notifications\InvitationEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -130,15 +133,48 @@ class NotificationController extends Controller
 
     public function handleSendInviteNotification(Request $request)
     {
-        
+        $data = $request->validate([
+            'event_id' => ['required', 'numeric', 'exists:events,id'],
+            'user_id' => ['required', 'numeric', 'exists:users,id'],
+            'from_id' => ['required', 'numeric', 'exists:users,id'],
+        ]);
+
+        $event = Event::find($data['event_id']);
+        $user = User::find($data['user_id']);
+
+        if($event) {
+            EventUser::create([
+                'user_id' => $data['user_id'],
+                'event_id' => $data['event_id'],
+                'from_id' => $data['from_id'],
+                'status' => 'pending',
+                'created_by' => $event->user_id,
+            ]);
+
+            if(count($user->fcm_tokens) > 0){
+
+            } else {
+                $user->notify(new InvitationEvent($event, $user));
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Gửi lời mời thành công!',
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Gửi lời mời thất bại!',
+        ], 400);
     }
 
     public function joinEvent(Request $request)
     {
         $data = $request->validate([
-            'event_id' => ['required', 'numeric'],
-            'user_id' => ['required', 'numeric'],
-            'from_id' => ['required', 'numeric'],
+            'event_id' => ['required', 'numeric', 'exists:events,id'],
+            'user_id' => ['required', 'numeric', 'exists:users,id'],
+            'from_id' => ['required', 'numeric', 'exists:users,id'],
             'status' => ['required'],
         ]);
 
@@ -159,6 +195,6 @@ class NotificationController extends Controller
         return response()->json([
             'status' => false,
             'message' => 'Join Event that bai!',
-        ], 500);
+        ], 400);
     }
 }

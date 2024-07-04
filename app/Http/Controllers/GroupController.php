@@ -178,6 +178,7 @@ class GroupController extends Controller
 
         $hours = 24;
         $token = Str::random(256);
+        
         GroupUser::create([
             'status' => GroupUserStatus::PENDING->value,
             'role' => GroupUserRole::USER->value,
