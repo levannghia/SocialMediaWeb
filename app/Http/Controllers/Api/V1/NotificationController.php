@@ -128,6 +128,11 @@ class NotificationController extends Controller
         }
     }
 
+    public function handleSendInviteNotification(Request $request)
+    {
+        
+    }
+
     public function joinEvent(Request $request)
     {
         $data = $request->validate([
@@ -139,7 +144,7 @@ class NotificationController extends Controller
 
         $eventUser = EventUser::where('event_id', $data['event_id'])
         ->where('user_id', $data['user_id'])
-        ->where('created_by', $data['from_id'])->first();
+        ->where('from_id', $data['from_id'])->first();
 
         if($eventUser) {
             $eventUser->status = $data['status'];

@@ -13,6 +13,7 @@ class EventUser extends Model
         'event_id',
         'user_id',
         'created_by',
+        'from_id',
         'status',
     ];
 }

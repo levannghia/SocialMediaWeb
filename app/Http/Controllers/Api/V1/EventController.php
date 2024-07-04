@@ -57,8 +57,6 @@ class EventController extends Controller
         $year = $dt->year;
         $month = $dt->month;
 
-        // $data = $request->validated();
-
         $path = '';
         $user = auth()->user();
         DB::beginTransaction();
