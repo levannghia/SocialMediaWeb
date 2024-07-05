@@ -197,7 +197,7 @@ class NotificationController extends Controller
             if($user->fcm_tokens){
                 foreach ($user->fcm_tokens as $token) { 
                     $this->handleSendNotificationEvent($token, $title, $body, [
-                        'id' => '12',
+                        'id' => $event->id,
                     ]);
                 }
             } else {
